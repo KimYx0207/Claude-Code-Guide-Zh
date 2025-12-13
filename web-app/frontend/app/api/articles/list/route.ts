@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   try {
     const projectRoot = path.join(process.cwd(), '..', '..');
     const draftDir = path.join(projectRoot, 'articles', 'drafts');
-    const archiveDir = path.join(projectRoot, 'articles', 'archive');
+    const articlesRoot = path.join(projectRoot, 'articles');  // 根目录可能有已发布文章
 
     const articles: Article[] = [];
 
@@ -56,13 +56,18 @@ export async function GET(request: NextRequest) {
       console.warn('读取草稿目录失败:', error);
     }
 
-    // 读取归档目录（已发布）
+    // 读取根目录（可能有已发布文章）
     try {
-      const archiveFiles = await fs.readdir(archiveDir);
-      for (const fileName of archiveFiles) {
-        if (!fileName.endsWith('.md')) continue;
+      const rootFiles = await fs.readdir(articlesRoot);
+      for (const fileName of rootFiles) {
+        if (!fileName.endsWith('.md') || fileName === 'README.md') continue;
 
-        const filePath = path.join(archiveDir, fileName);
+        const filePath = path.join(articlesRoot, fileName);
+        const stat = await fs.stat(filePath);
+
+        // 确保是文件而不是目录
+        if (!stat.isFile()) continue;
+
         const content = await fs.readFile(filePath, 'utf-8');
 
         const parsed = parseFileName(fileName);
@@ -74,13 +79,13 @@ export async function GET(request: NextRequest) {
           category: parsed.category,
           timeliness: parsed.timeliness,
           brand: parsed.brand,
-          status: 'published',
+          status: 'published',  // 根目录视为已发布
           words: content.length,
           qualityScore: null
         });
       }
     } catch (error) {
-      console.warn('读取归档目录失败:', error);
+      console.warn('读取根目录失败:', error);
     }
 
     // 按日期降序排序
