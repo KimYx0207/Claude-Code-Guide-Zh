@@ -64,12 +64,12 @@ class DataSyncChecker:
         初始化检查器
 
         Args:
-            base_path: 基础路径（默认为脚本所在目录的父目录）
+            base_path: 基础路径（默认为脚本所在目录的父父目录）
         """
         if base_path is None:
-            # 脚本在 scripts/ 目录下，base_path 应该是 gongzhonghao-writer/
-            script_dir = Path(__file__).parent
-            self.base_path = script_dir.parent
+            # 脚本在 scripts/utils/ 目录下，base_path 应该是 gongzhonghao-writer/
+            script_dir = Path(__file__).parent  # scripts/utils/
+            self.base_path = script_dir.parent.parent  # gongzhonghao-writer/
         else:
             self.base_path = Path(base_path)
 

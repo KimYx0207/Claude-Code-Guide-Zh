@@ -25,7 +25,8 @@ export default function EditorPage() {
   };
 
   const handleQualityCheck = () => {
-    router.push(`/quality?content=${encodeURIComponent(content)}`);
+    // 跳转到写作流程的质检页面（第4步）
+    router.push(`/write/quality-check?content=${encodeURIComponent(content)}&topic=${encodeURIComponent(topic)}`);
   };
 
   return (
@@ -59,25 +60,30 @@ export default function EditorPage() {
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={handleQualityCheck} className="flex-1">
-            质量检测
+          <Button onClick={handleQualityCheck} className="flex-1" disabled={!content.trim()}>
+            下一步：质量检测
           </Button>
-          <Button variant="outline" className="flex-1">
-            预览文章
+          <Button variant="outline" onClick={handleSave} className="flex-1">
+            保存草稿
           </Button>
         </div>
 
         <div className="mt-6 card p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">写作流程</h3>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="px-3 py-1 rounded-full bg-gray-200">1. 输入主题</span>
+            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700">✓ 1. 输入主题</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="px-3 py-1 rounded-full bg-gray-200">2. 选择标题</span>
+            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700">✓ 2. 选择标题</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
             <span className="px-3 py-1 rounded-full bg-blue-600 text-white">3. 编辑文章</span>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="px-3 py-1 rounded-full bg-gray-200">4. 质量检测</span>
           </div>
         </div>
       </div>
