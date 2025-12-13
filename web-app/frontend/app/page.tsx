@@ -458,7 +458,7 @@ function WriteTab() {
           value={article}
           onChange={(e) => setArticle(e.target.value)}
           className="w-full h-96 p-4 border border-gray-200 rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="点击"一键生成文章"或手动编辑..."
+          placeholder="点击上方按钮生成文章，或手动编辑..."
         />
       </div>
 
