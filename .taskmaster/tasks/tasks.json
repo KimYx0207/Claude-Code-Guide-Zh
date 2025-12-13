@@ -1,0 +1,386 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "配置和环境初始化",
+        "description": "完成项目的基础配置和环境搭建，包括MCP服务器配置、API密钥管理、项目目录结构初始化",
+        "details": "1. 配置.mcp.json文件，添加brave-search、open-websearch、exa、context7等MCP服务器\n2. 创建.env.example模板文件\n3. 验证MCP Router连接\n4. 初始化项目目录结构（articles/、.claude/backups/等）",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "主题分析器实现",
+        "description": "实现智能主题分析器，自动判断文章主题类型，决定是否需要research以及需要哪些工具",
+        "details": "1. 实现关键词识别算法（最新/趋势/对比/工具名等）\n2. 实现主题类型分类（技术测评/趋势分析/经验分享）\n3. 实现工具选择逻辑（根据主题选择最佳MCP工具组合）\n4. 单元测试覆盖",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Research引擎核心实现",
+        "description": "实现多工具调用编排的Research引擎，支持并行调用、降级策略、结果整合",
+        "details": "1. 实现MCP工具调用接口（brave-search/open-websearch/exa/context7）\n2. 实现并行调用逻辑\n3. 实现降级策略（MCP失败→WebSearch备选）\n4. 实现结果整合和去重算法\n5. 生成结构化research报告",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "1",
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "老金风格写作引擎V4",
+        "description": "基于V4自然引导理念实现老金风格写作引擎，生成真实自然的文章内容",
+        "details": "1. 读取并解析prompts/laojin-style-v4-natural.md风格指南\n2. 实现文章结构生成逻辑（开头钩子/中间案例/结尾升华）\n3. 实现格式规范自动应用（顿号/加粗/段落间距）\n4. 实现禁用词检测和替换建议\n5. 集成research结果到文章内容",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "百万阅读量标题生成器",
+        "description": "实现基于12大公式的爆款标题生成系统，自动生成5个高质量SEO标题",
+        "details": "1. 实现12大标题公式算法\n2. 实现SEO评分系统（关键词前置/长度/数字对比等）\n3. 实现爆款指数评估（情绪冲击/痛点/反常识/紧迫感）\n4. 实现推荐逻辑（自动选择最佳标题并说明理由）\n5. 支持生成5个不同公式的标题",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "4"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "8维度质量检测系统",
+        "description": "实现客观量化的8维度质量检测引擎，确保文章符合老金风格标准",
+        "details": "1. 实现AI腔检测算法（禁用词/机械化句式检测）\n2. 实现自然度算法（句长变化/口语化比例/反问句比例）\n3. 实现真诚度和啰嗦度检测\n4. 实现重复度检测算法\n5. 实现可读性检测\n6. 实现人味儿指数算法（第一人称/情感词汇/真实案例）\n7. 实现情感真实性检测\n8. 生成详细质量报告和修改建议",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "4"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Hook验证系统实现",
+        "description": "实现PreToolUse和PostToolUse Hook系统，强制执行质量标准和流程规范",
+        "details": "1. 实现PreToolUse Hook（research步骤验证，阻止未完成research的保存）\n2. 实现PostToolUse Hook（调用质量检测引擎）\n3. 实现10项风格规范检查（段落长度/粗体使用/禁用词等）\n4. 实现Hook执行器（hook_executor.py）\n5. 集成到.claude/hooks/目录",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "6"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "文件组织和管理系统",
+        "description": "实现自动文件命名、归档和备份系统",
+        "details": "1. 实现规范文件命名算法（YYYY-MM-DD_主题_老金风格.md）\n2. 实现自动归档到articles目录\n3. 实现自动备份机制（保留10个版本到.claude/backups/）\n4. 实现文件冲突检测和处理\n5. 实现file_organizer.py",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "7"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "工作流引擎编排",
+        "description": "实现端到端的工作流编排引擎，串联所有功能模块",
+        "details": "1. 实现workflow_engine.py主控逻辑\n2. 实现需求解析和条件路由\n3. 串联主题分析→Research→写作→标题→质量检测→保存流程\n4. 实现错误处理和重试机制\n5. 实现进度反馈",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "自动配图系统（V4.1）",
+        "description": "实现自动配图功能，使用Unsplash搜索或MiniMax生成图片",
+        "details": "1. 集成Unsplash MCP服务器\n2. 实现图片搜索逻辑（基于主题和段落内容）\n3. 集成MiniMax API作为备选方案\n4. 实现图片自动插入逻辑（开头+核心段落）\n5. 实现配图风格统一管理\n6. 配图成功率>85%",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "9"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "信息图生成系统（V4.1）",
+        "description": "实现自动信息图生成功能，支持对比表格、流程图、数据卡片",
+        "details": "1. 实现文章类型识别算法（对比/流程/数据类关键词检测）\n2. 实现HTML信息图模板（对比表格/流程图/数据卡片）\n3. 集成Playwright进行自动截图\n4. 实现信息图自动嵌入逻辑\n5. 类型识别准确率>90%",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "9"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "/gongzhonghao 命令集成",
+        "description": "将工作流引擎集成到 /gongzhonghao Slash命令，实现一键自动化",
+        "details": "1. 更新.claude/commands/gongzhonghao.md\n2. 集成workflow_engine调用\n3. 实现主题参数传递\n4. 实现进度实时反馈\n5. 实现错误友好提示",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "9",
+          "10",
+          "11"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "MVP端到端测试",
+        "description": "完成MVP核心流程的端到端测试，确保基本功能可用",
+        "details": "1. 测试场景1：技术测评类文章（需要research）\n2. 测试场景2：经验分享类文章（无需research）\n3. 验证质量检测一次通过率>80%\n4. 验证Research工具调用成功率>90%\n5. 验证从主题到成稿时间<5分钟\n6. 修复发现的bug",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "12"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "文档和使用指南",
+        "description": "编写完整的使用文档和故障排除指南",
+        "details": "1. 更新README.md\n2. 编写快速开始指南\n3. 编写MCP配置教程\n4. 编写故障排除FAQ\n5. 更新CLAUDE.md项目上下文\n6. 录制演示视频（可选）",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "13"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "性能优化和监控",
+        "description": "优化系统性能，添加监控和成本控制",
+        "details": "1. 实现Research结果缓存机制\n2. 优化MCP工具并行调用\n3. 添加API配额监控和预警\n4. 优化质量检测算法性能\n5. 实现单篇文章成本统计\n6. 目标：总时间<2分30秒",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "13"
+        ],
+        "priority": "low",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "写作命令模块化重构",
+        "description": "将公众号写作助手的写作命令（/write, /write-auto, /write-rewrite）进行模块化重构，确保标题生成、标题评分、质量检测等功能统一调用Python脚本，消除代码重复，保证输出格式一致。",
+        "details": "",
+        "testStrategy": "",
+        "status": "in-progress",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "增强title_generator.py输出格式",
+            "description": "增强title_generator.py，添加generate_with_reason()方法，返回完整的标题+公式+评分+爆款指数+推荐理由",
+            "details": "",
+            "status": "in-progress",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "updatedAt": "2025-12-10T02:11:11.884Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "创建统一输出格式模块",
+            "description": "创建.claude/skills/gongzhonghao-writer/modules/title-output-format.md，定义所有写作命令必须遵循的标题输出格式标准",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "重构01-write.md标题生成部分",
+            "description": "删除01-write.md中内嵌的80行规则定义（第257-334行），改为调用title_generator.py脚本，保持输出格式一致",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "重构02-write-auto.md标题生成部分",
+            "description": "重构02-write-auto.md，删除简化的标题生成逻辑，改为调用title_generator.py脚本，添加完整的评分和推荐理由输出",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "重构03-write-rewrite.md标题生成部分",
+            "description": "重构03-write-rewrite.md，添加调用title_generator.py的具体步骤，添加完整的评分和推荐理由输出",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "更新CLAUDE.md模块化规范",
+            "description": "更新CLAUDE.md，记录模块化架构设计和数据依赖链说明，确保未来开发遵循模块化原则",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16,
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-12-10T02:11:11.884Z"
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-12-10T02:11:11.885Z",
+      "taskCount": 16,
+      "completedCount": 0,
+      "tags": [
+        "master"
+      ],
+      "created": "2025-12-12T18:32:36.954Z",
+      "description": "Tasks for master context",
+      "updated": "2025-12-12T18:32:36.954Z"
+    }
+  },
+  "web-ui-premium": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "P0：Design Tokens + Tailwind 主题扩展（Modern Minimal Premium）",
+        "description": "建立全局设计 tokens，并在 Tailwind 中映射 colors/font/shadow/radius，收敛背景与配色，为全站统一高级风格打底。",
+        "details": "- 修改 web-app/frontend/app/globals.css：定义 tokens（bg/surface/text/muted/border/accent/ring/shadow/radius），替换现有紫蓝渐变/漂浮光效为克制底纹，支持 prefers-reduced-motion\\n- 修改 web-app/frontend/tailwind.config.js：extend colors/fontFamily/boxShadow/borderRadius 指向 tokens\\n- 验收：页面与组件不再依赖 violet/blue 写死渐变；后续换主题只改 tokens",
+        "testStrategy": "",
+        "status": "in-progress",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [],
+        "updatedAt": "2025-12-13T02:36:36.397Z"
+      },
+      {
+        "id": "2",
+        "title": "P0：Typography 升级（字体与层级）",
+        "description": "升级全站字体与排版层级：正文无衬线+中文 fallback，标题中文衬线（杂志感），统一字号/行高/字重。",
+        "details": "- 修改 web-app/frontend/app/layout.tsx：引入并应用 Inter + Noto Sans SC + Noto Serif SC（标题）\\n- 修改 web-app/frontend/app/globals.css：定义 heading/body 字号与行高基线\\n- 验收：标题/正文层级清晰，长文更耐读",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": "3",
+        "title": "P0：基础组件高级化（Button/Card/Input）",
+        "description": "重做 Button/Card/Input：去大渐变与强玻璃拟态，统一圆角/阴影/边框/交互与 focus ring，全面使用 tokens。",
+        "details": "- 修改 web-app/frontend/components/ui/button.tsx：primary/secondary/ghost/outline，克制 hover/active\\n- 修改 web-app/frontend/components/ui/card.tsx：面板风格分层（surface/elevated）\\n- 修改 web-app/frontend/components/ui/input.tsx：边框/聚焦使用 tokens，提升可读性\\n- 验收：Home 与 Title 页组件质感一致",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "1",
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": "4",
+        "title": "P1：首页升级为现代产品落地页",
+        "description": "首页从彩色卡片+emoji 改为克制产品风：线性图标、统一卡片、清晰层级与留白。",
+        "details": "- 修改 web-app/frontend/app/page.tsx：lucide-react 替换 emoji；hero 更克制；cards 去彩色渐变块\\n- 验收：截图观感接近成熟产品官网",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": "5",
+        "title": "P1：标题生成页升级为报告式输出",
+        "description": "标题页结果区做成高级报告：克制标记、复制反馈、skeleton loading，并统一 API 调用走 /api rewrites。",
+        "details": "- 修改 web-app/frontend/app/title/page.tsx：去彩色堆叠；添加复制反馈；loading 占位\\n- 修正 fetch URL：使用 /api/title/generate（匹配 next.config.js rewrites）\\n- 验收：结果区更像报告，交互更专业",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": "6",
+        "title": "P1：动效/性能/无障碍收口",
+        "description": "支持 prefers-reduced-motion，减少大面积 fixed 动画叠层，确保对比度与 focus 可见性。",
+        "details": "- 修改 web-app/frontend/app/globals.css：reduced-motion 降级动画；弱化或移除 body::after 大光效\\n- 检查按钮/输入 focus ring 与对比度\\n- 验收：滚动更顺滑，减少动态效果下体验完整",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "4",
+          "5"
+        ],
+        "priority": "low",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-12-13T02:36:36.399Z",
+      "taskCount": 6,
+      "completedCount": 0,
+      "tags": [
+        "web-ui-premium"
+      ]
+    }
+  }
+}

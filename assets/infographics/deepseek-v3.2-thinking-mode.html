@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek V3.2 思考模式对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 1200px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+            color: #1a202c;
+            font-weight: 800;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        .mode {
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 32px;
+            border: 3px solid #e2e8f0;
+        }
+        .mode.thinking {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #f7fafc 100%);
+        }
+        .mode-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mode-title .icon {
+            width: 36px;
+            height: 36px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        .mode.normal .mode-title .icon {
+            background: #cbd5e0;
+        }
+        .scenario {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .scenario-title {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        .step-num {
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .mode.normal .step-num {
+            background: #cbd5e0;
+        }
+        .step-text {
+            flex: 1;
+            padding-top: 4px;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #047857;
+        }
+        .mode.normal .result {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 DeepSeek V3.2: 思考模式 vs 普通模式</h1>
+
+        <div class="comparison">
+            <div class="mode normal">
+                <div class="mode-title">
+                    <div class="icon">⚡</div>
+                    <span>普通模式</span>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">用户请求</div>
+                    <p>"帮我查下明天北京天气，顺便订个咖啡"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">调用天气API</div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">调用订单API</div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text">返回结果</div>
+                </div>
+
+                <div class="result">
+                    ❌ 直接执行，可能遗漏关联需求
+                </div>
+            </div>
+
+            <div class="mode thinking">
+                <div class="mode-title">
+                    <div class="icon">🤔</div>
+                    <span>思考模式（V3.2）</span>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">用户请求</div>
+                    <p>"帮我查下明天北京天气，顺便订个咖啡"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <span class="highlight">先思考</span>："需要查天气和下单，天气影响穿着，可能影响咖啡口味选择"
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">调用天气API</div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <span class="highlight">根据天气思考</span>：冷→推荐热饮，热→推荐冰饮
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-text">调用订单API（智能推荐）</div>
+                </div>
+
+                <div class="result">
+                    ✅ 多层思考，准确率更高，用户体验更好
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

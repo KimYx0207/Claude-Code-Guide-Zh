@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1400" width="1600" height="1400">
+  <defs>
+    <style>
+      .title {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 42px;
+        font-weight: 700;
+        fill: #1a1a1a;
+        letter-spacing: -1px;
+      }
+      .subtitle {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 16px;
+        fill: #666666;
+        font-weight: 400;
+      }
+      .layer-label {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        fill: #ffffff;
+        text-anchor: middle;
+        letter-spacing: 0.5px;
+      }
+      .component-title {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        fill: #ffffff;
+        text-anchor: middle;
+      }
+      .component-text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 13px;
+        fill: #ffffff;
+        text-anchor: middle;
+        opacity: 0.95;
+      }
+      .note-text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 12px;
+        fill: #333333;
+      }
+      .label-text {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        font-size: 11px;
+        fill: #666666;
+        font-weight: 500;
+      }
+    </style>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1600" height="1400" fill="#fafafa"/>
+
+  <!-- 标题 -->
+  <text x="800" y="60" text-anchor="middle" class="title">Claude Code 架构</text>
+  <text x="800" y="90" text-anchor="middle" class="subtitle">基于官方文档的完整系统架构</text>
+
+  <!-- 第1层：Plugin 系统 (顶层容器) -->
+  <g id="layer-plugin">
+    <!-- 背景框 -->
+    <rect x="40" y="140" width="1520" height="340" rx="0" fill="#e8eaf6" stroke="none"/>
+
+    <!-- 层级标签 -->
+    <rect x="40" y="140" width="1520" height="40" fill="#3f51b5" stroke="none"/>
+    <text x="800" y="167" class="layer-label">PLUGIN 系统 — 顶层打包与分发机制</text>
+
+    <!-- 5个组件卡片 -->
+
+    <!-- Commands -->
+    <rect x="80" y="210" width="260" height="220" rx="0" fill="#ff6f00" stroke="none"/>
+    <text x="210" y="245" class="component-title">Commands</text>
+    <text x="210" y="275" class="component-text">Slash Commands</text>
+    <text x="210" y="300" class="component-text" font-size="11">commands/*.md</text>
+    <line x1="110" y1="315" x2="310" y2="315" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+    <text x="210" y="340" class="component-text" font-size="11">用户手动调用</text>
+    <text x="210" y="365" class="component-text" font-size="11">/command-name</text>
+    <text x="210" y="390" class="component-text" font-size="11" font-weight="700">3个来源</text>
+    <text x="210" y="410" class="component-text" font-size="10">本地 + Plugin + MCP</text>
+
+    <!-- Agents -->
+    <rect x="370" y="210" width="260" height="220" rx="0" fill="#7b1fa2" stroke="none"/>
+    <text x="500" y="245" class="component-title">Agents</text>
+    <text x="500" y="275" class="component-text">Subagents</text>
+    <text x="500" y="300" class="component-text" font-size="11">agents/*.md</text>
+    <line x1="400" y1="315" x2="600" y2="315" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+    <text x="500" y="340" class="component-text" font-size="11">专门的 AI 助手</text>
+    <text x="500" y="365" class="component-text" font-size="11">独立上下文</text>
+    <text x="500" y="390" class="component-text" font-size="11" font-weight="700">2个来源</text>
+    <text x="500" y="410" class="component-text" font-size="10">Plugin + Task 工具</text>
+
+    <!-- Skills -->
+    <rect x="660" y="210" width="260" height="220" rx="0" fill="#2e7d32" stroke="none"/>
+    <text x="790" y="245" class="component-title">Skills</text>
+    <text x="790" y="275" class="component-text">Model-Invoked</text>
+    <text x="790" y="300" class="component-text" font-size="11">skills/*/SKILL.md</text>
+    <line x1="690" y1="315" x2="890" y2="315" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+    <text x="790" y="340" class="component-text" font-size="11">Claude 自主调用</text>
+    <text x="790" y="365" class="component-text" font-size="11">无需用户触发</text>
+    <text x="790" y="390" class="component-text" font-size="11" font-weight="700">示例</text>
+    <text x="790" y="410" class="component-text" font-size="10">document-skills</text>
+
+    <!-- Hooks -->
+    <rect x="950" y="210" width="260" height="220" rx="0" fill="#0277bd" stroke="none"/>
+    <text x="1080" y="245" class="component-title">Hooks</text>
+    <text x="1080" y="275" class="component-text">事件处理器</text>
+    <text x="1080" y="300" class="component-text" font-size="11">hooks/hooks.json</text>
+    <line x1="980" y1="315" x2="1180" y2="315" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+    <text x="1080" y="340" class="component-text" font-size="11">自动响应事件</text>
+    <text x="1080" y="365" class="component-text" font-size="11">拦截和增强</text>
+    <text x="1080" y="390" class="component-text" font-size="11" font-weight="700">横切关注点</text>
+    <text x="1080" y="410" class="component-text" font-size="10">环绕所有层</text>
+
+    <!-- MCP Servers -->
+    <rect x="1240" y="210" width="260" height="220" rx="0" fill="#4527a0" stroke="none"/>
+    <text x="1370" y="245" class="component-title">MCP Servers</text>
+    <text x="1370" y="275" class="component-text">外部集成</text>
+    <text x="1370" y="300" class="component-text" font-size="11">.mcp.json</text>
+    <line x1="1270" y1="315" x2="1470" y2="315" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+    <text x="1370" y="340" class="component-text" font-size="11" font-weight="700">3种能力</text>
+    <text x="1370" y="365" class="component-text" font-size="10">Resources (@)</text>
+    <text x="1370" y="385" class="component-text" font-size="10">Prompts (/)</text>
+    <text x="1370" y="405" class="component-text" font-size="10">Tools (函数)</text>
+  </g>
+
+  <!-- 第2层：核心引擎 -->
+  <g id="layer-cli">
+    <rect x="40" y="520" width="1520" height="120" rx="0" fill="#1565c0" stroke="none"/>
+    <text x="800" y="560" class="layer-label" font-size="20">CLAUDE CODE CLI — 核心引擎</text>
+    <text x="800" y="590" class="component-text" font-size="13">加载 Plugin 组件  |  调度执行  |  管理上下文</text>
+    <text x="800" y="615" class="component-text" font-size="11">作为 MCP Client 连接外部服务  |  作为 MCP Server 暴露自身能力</text>
+  </g>
+
+  <!-- 第3层：执行单元 -->
+  <g id="layer-execution">
+    <rect x="40" y="680" width="1520" height="200" rx="0" fill="#f5f5f5" stroke="none"/>
+
+    <rect x="40" y="680" width="1520" height="40" fill="#616161" stroke="none"/>
+    <text x="800" y="707" class="layer-label">执行单元层</text>
+
+    <!-- Main Instance -->
+    <rect x="180" y="750" width="540" height="100" rx="0" fill="#e65100" stroke="none"/>
+    <text x="450" y="785" class="component-title">Main Instance</text>
+    <text x="450" y="810" class="component-text">主实例 — 直接执行用户请求</text>
+    <text x="450" y="835" class="component-text" font-size="11">可调用所有工具和组件</text>
+
+    <!-- Subagents -->
+    <rect x="880" y="750" width="540" height="100" rx="0" fill="#c62828" stroke="none"/>
+    <text x="1150" y="785" class="component-title">Subagents</text>
+    <text x="1150" y="810" class="component-text">子智能体 — 专门处理特定任务</text>
+    <text x="1150" y="835" class="component-text" font-size="11">独立 AI 实例（来自 Plugin 或 Task 工具）</text>
+  </g>
+
+  <!-- 第4层：工具层 -->
+  <g id="layer-tools">
+    <rect x="40" y="920" width="1520" height="240" rx="0" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+
+    <rect x="40" y="920" width="1520" height="40" fill="#9e9e9e" stroke="none"/>
+    <text x="800" y="947" class="layer-label">工具层</text>
+
+    <!-- Plugin 提供的工具 -->
+    <rect x="80" y="990" width="700" height="140" rx="0" fill="#ede7f6" stroke="#7e57c2" stroke-width="2"/>
+    <text x="430" y="1020" class="note-text" font-weight="700" text-anchor="middle">Plugin 提供的工具</text>
+
+    <text x="200" y="1050" class="note-text" font-weight="700">Skills</text>
+    <text x="200" y="1070" class="note-text" font-size="11">Claude 自主调用</text>
+    <text x="200" y="1090" class="note-text" font-size="10">document-skills</text>
+
+    <text x="430" y="1050" class="note-text" font-weight="700">MCP Tools</text>
+    <text x="430" y="1070" class="note-text" font-size="11">外部工具函数</text>
+    <text x="430" y="1090" class="note-text" font-size="10">github/filesystem</text>
+
+    <text x="640" y="1050" class="note-text" font-weight="700">MCP Resources</text>
+    <text x="640" y="1070" class="note-text" font-size="11">@ 引用资源</text>
+    <text x="640" y="1090" class="note-text" font-size="10">@google-drive/doc</text>
+
+    <!-- 内置工具 -->
+    <rect x="820" y="990" width="700" height="140" rx="0" fill="#eceff1" stroke="#546e7a" stroke-width="2"/>
+    <text x="1170" y="1020" class="note-text" font-weight="700" text-anchor="middle">内置工具（无需 Plugin）</text>
+    <text x="1170" y="1055" class="note-text" text-anchor="middle">Read  |  Write  |  Edit  |  Bash  |  Glob  |  Grep</text>
+    <text x="1170" y="1080" class="note-text" text-anchor="middle">WebFetch  |  WebSearch  |  TodoWrite</text>
+    <text x="1170" y="1105" class="note-text" font-size="10" text-anchor="middle">Claude Code 核心能力</text>
+  </g>
+
+  <!-- 连接关系 -->
+  <g id="connections">
+    <!-- Plugin 到 CLI -->
+    <line x1="800" y1="480" x2="800" y2="520" stroke="#424242" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="720" y="490" width="160" height="24" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+    <text x="800" y="507" class="label-text" text-anchor="middle">加载组件</text>
+
+    <!-- CLI 到执行单元 -->
+    <line x1="450" y1="640" x2="450" y2="750" stroke="#424242" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="370" y="685" width="160" height="24" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+    <text x="450" y="702" class="label-text" text-anchor="middle">主实例执行</text>
+
+    <line x1="1150" y1="640" x2="1150" y2="750" stroke="#424242" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="1070" y="685" width="160" height="24" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+    <text x="1150" y="702" class="label-text" text-anchor="middle">启动 Subagent</text>
+
+    <!-- 执行单元到工具 -->
+    <line x1="450" y1="850" x2="430" y2="990" stroke="#757575" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-light)"/>
+    <line x1="450" y1="850" x2="1170" y2="990" stroke="#757575" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-light)"/>
+    <line x1="1150" y1="850" x2="430" y2="990" stroke="#757575" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-light)"/>
+    <line x1="1150" y1="850" x2="1170" y2="990" stroke="#757575" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-light)"/>
+  </g>
+
+  <!-- 底部说明 -->
+  <g id="legend">
+    <rect x="40" y="1200" width="1520" height="160" rx="0" fill="#fafafa" stroke="#e0e0e0" stroke-width="1"/>
+
+    <text x="60" y="1230" class="note-text" font-weight="700" font-size="14">关键概念</text>
+    <text x="60" y="1255" class="note-text">• Plugin：打包和分发机制，可包含 Commands/Agents/Skills/Hooks/MCP Servers</text>
+    <text x="60" y="1275" class="note-text">• Commands：用户手动调用（/name），来自本地、Plugin 或 MCP Servers</text>
+    <text x="60" y="1295" class="note-text">• Agents：专门的 Subagents，来自 Plugin（预定义）或 Task 工具（临时）</text>
+    <text x="60" y="1315" class="note-text">• Skills：Claude 自主决定调用，无需用户触发</text>
+    <text x="60" y="1335" class="note-text">• MCP Servers：外部工具连接，提供 Resources(@)/Prompts(/)/Tools 三种能力</text>
+
+    <text x="900" y="1230" class="note-text" font-weight="700" font-size="14">核心区别</text>
+    <text x="900" y="1255" class="note-text">• Commands vs Skills：Commands 手动触发，Skills 自主调用</text>
+    <text x="900" y="1275" class="note-text">• Plugin vs MCP：Plugin 是容器，MCP 是协议</text>
+    <text x="900" y="1295" class="note-text">• Main Instance vs Subagents：主实例通用，Subagents 专注特定任务</text>
+  </g>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="3" orient="auto">
+      <polygon points="0 0, 12 3, 0 6" fill="#424242"/>
+    </marker>
+    <marker id="arrow-light" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#757575"/>
+    </marker>
+  </defs>
+
+  <!-- 数据源 -->
+  <text x="800" y="1385" text-anchor="middle" class="label-text" font-size="10" fill="#999999">
+    官方文档：docs.claude.com/en/docs/claude-code/plugins | docs.claude.com/en/docs/claude-code/mcp
+  </text>
+
+</svg>

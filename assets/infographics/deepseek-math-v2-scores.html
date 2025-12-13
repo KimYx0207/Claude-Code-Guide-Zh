@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek Math-V2 竞赛成绩</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 1200px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 16px;
+            color: #1a202c;
+            font-weight: 800;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 48px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, -20px); }
+        }
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        .medal {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .competition {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        .full-name {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 24px;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        .score-detail {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        .rank {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .highlight {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 DeepSeek Math-V2 竞赛成绩</h1>
+        <div class="subtitle">685B参数 | 开源数学推理模型首次达到IMO金牌水平</div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="card-content">
+                    <span class="medal">🥇</span>
+                    <div class="competition">IMO 2025</div>
+                    <div class="full-name">国际数学奥林匹克</div>
+                    <div class="score">83.3%</div>
+                    <div class="score-detail">6道题做对5道</div>
+                    <div class="rank">🌍 全球排名第3</div>
+                    <div class="highlight">金牌标准</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <span class="medal">💯</span>
+                    <div class="competition">Putnam 2024</div>
+                    <div class="full-name">普特南数学竞赛</div>
+                    <div class="score">118/120</div>
+                    <div class="score-detail">接近满分</div>
+                    <div class="rank">🔥 超越人类历史最高分90分</div>
+                    <div class="highlight">AI > 人类顶尖</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <span class="medal">🥇</span>
+                    <div class="competition">CMO 2024</div>
+                    <div class="full-name">中国数学奥林匹克</div>
+                    <div class="score">金牌</div>
+                    <div class="score-detail">达到金牌标准</div>
+                    <div class="rank">🇨🇳 国内顶级水平</div>
+                    <div class="highlight">推理严谨性验证</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

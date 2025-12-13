@@ -1,0 +1,11 @@
+{
+  "wechat_publish_url": "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?sub=list&begin=0&count=10&token=870900889&lang=zh_CN",
+  "url_pattern": "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?sub=list&begin={begin}&count={count}&token={token}&lang=zh_CN",
+  "url_params": {
+    "begin": 0,
+    "count": 10,
+    "token": "870900889",
+    "lang": "zh_CN"
+  },
+  "notes": "token可能会变化，每次收集前确认URL是否有效"
+}

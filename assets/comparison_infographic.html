@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI生图工具对比 - Nano Banana Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+            transition: background 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: #34495e;
+            text-align: left;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            font-weight: 700;
+            color: #856404;
+        }
+
+        .winner {
+            color: #27ae60;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .winner::before {
+            content: "✓ ";
+            font-size: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #3498db;
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-pro {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI生图工具核心能力对比</h1>
+        <p class="subtitle">数据来源：Google官方 | TechCrunch | 2025年11月</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left;">对比维度</th>
+                    <th>Nano Banana Pro<span class="badge badge-pro">NEW</span></th>
+                    <th>即梦</th>
+                    <th>万相2.2</th>
+                    <th>混元</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>中文文字渲染</strong></td>
+                    <td class="winner highlight">业界最高<br/>简繁体都准确</td>
+                    <td>一般<br/>有误差</td>
+                    <td>一般<br/>有误差</td>
+                    <td>一般<br/>有误差</td>
+                </tr>
+                <tr>
+                    <td><strong>人物一致性</strong></td>
+                    <td class="winner highlight">支持5个人物<br/>跨场景保持</td>
+                    <td>1-2个<br/>有限</td>
+                    <td>1-2个<br/>有限</td>
+                    <td>1-2个<br/>有限</td>
+                </tr>
+                <tr>
+                    <td><strong>多图融合能力</strong></td>
+                    <td class="winner highlight">最多14张图<br/>同时融合</td>
+                    <td>单张或双张<br/>有限</td>
+                    <td>单张或双张<br/>有限</td>
+                    <td>单张或双张<br/>有限</td>
+                </tr>
+                <tr>
+                    <td><strong>中文提示词理解</strong></td>
+                    <td class="winner">优秀<br/>精准3倍提升</td>
+                    <td class="winner">优秀<br/>国产优势</td>
+                    <td class="winner">优秀<br/>电商优化</td>
+                    <td class="winner">优秀<br/>腾讯生态</td>
+                </tr>
+                <tr>
+                    <td><strong>生成速度</strong></td>
+                    <td class="winner highlight">比GPT-4o快<br/>2-3倍</td>
+                    <td>中等<br/>3-5分钟</td>
+                    <td>快速<br/>阿里云加速</td>
+                    <td>中等<br/>3-5分钟</td>
+                </tr>
+                <tr>
+                    <td><strong>分辨率</strong></td>
+                    <td class="winner highlight">原生2K<br/>可选4K</td>
+                    <td>1024x1024<br/>标准</td>
+                    <td>2048x2048<br/>电商优化</td>
+                    <td>1024x1024<br/>标准</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p>* 表格中"✓"标记为该维度最优表现 | 数据截至2025年11月20日</p>
+            <p>即梦、万相2.2、混元理解中文提示词强，但图片里的中文字写得清不清楚、人物一致不一致、能不能融合14张图，Nano Banana Pro更强。</p>
+        </div>
+    </div>
+</body>
+</html>

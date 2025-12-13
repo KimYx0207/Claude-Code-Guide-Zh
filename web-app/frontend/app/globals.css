@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   极简设计系统 - 统一蓝色主题
+   ============================================================ */
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --primary: 217 91% 60%;
+  --border: 0 0% 85%;
+  --muted-foreground: 0 0% 40%;
+  --radius: 8px;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 简洁卡片 */
+.card {
+  background: white;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* 简洁徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid hsl(var(--border));
+}
+
+/* 简洁淡入 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}

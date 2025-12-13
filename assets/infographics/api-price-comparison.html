@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek V3.2 API价格对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 32px;
+            color: #1a202c;
+            font-weight: 700;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .price-card {
+            text-align: center;
+            padding: 24px;
+            border-radius: 8px;
+        }
+        .old-price {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+        .new-price {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+        }
+        .label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #4a5568;
+        }
+        .price {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .old-price .price {
+            color: #ef4444;
+            text-decoration: line-through;
+        }
+        .new-price .price {
+            color: #10b981;
+        }
+        .detail {
+            font-size: 12px;
+            color: #718096;
+        }
+        .highlight {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+        }
+        .highlight-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #047857;
+            text-align: center;
+        }
+        .note {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #718096;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 DeepSeek V3.2 API价格暴降</h1>
+
+        <div class="comparison">
+            <div class="price-card old-price">
+                <div class="label">V3.1 旧价格</div>
+                <div class="price">$12</div>
+                <div class="detail">100万token/天</div>
+            </div>
+
+            <div class="price-card new-price">
+                <div class="label">V3.2 新价格</div>
+                <div class="price">$6</div>
+                <div class="detail">100万token/天</div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <div class="highlight-text">📉 成本直降 50%</div>
+        </div>
+
+        <div class="highlight" style="background: #fef3c7; border-left-color: #f59e0b;">
+            <div class="highlight-text" style="color: #b45309;">💡 长文本推理场景降 50-70%</div>
+        </div>
+
+        <div class="note">数据来源：DeepSeek官方定价 | 每月节省$180</div>
+    </div>
+</body>
+</html>

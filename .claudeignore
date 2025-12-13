@@ -1,0 +1,64 @@
+# .claudeignore
+
+# Python缓存和编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Git目录
+.git/
+.gitignore
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+*.swp
+*.bak
+
+# 测试覆盖率
+.coverage
+htmlcov/
+*.cover
+
+# IDE配置
+.vscode/
+.idea/
+*.sublime-*
+
+# 构建输出
+dist/
+build/
+*.egg-info/
+
+# 文档构建
+docs/_build/
+site/
+
+# 大文件和媒体
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar.gz
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 环境变量
+.env
+.env.*
+!.env.example

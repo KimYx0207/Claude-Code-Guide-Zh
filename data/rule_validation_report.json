@@ -1,0 +1,418 @@
+{
+  "metadata": {
+    "analysis_date": "2025-12-09T18:53:26.649136",
+    "total_articles": 82,
+    "rules_analyzed": 14
+  },
+  "rules": {
+    "brand_word": {
+      "name": "品牌词",
+      "description": "标题含Claude/Cursor/Gemini/ChatGPT等品牌词",
+      "original_weight": 30,
+      "hit_count": 51,
+      "miss_count": 31,
+      "hit_rate": 62.2,
+      "avg_read_when_hit": 1539.0,
+      "avg_read_when_miss": 967.0,
+      "effectiveness": 1.59,
+      "lift_vs_global": 16.3,
+      "top_3_hits": [
+        {
+          "title": "Gemini Pro开始二次校验了？手把手教你怎么过",
+          "read": 16046,
+          "like": 191
+        },
+        {
+          "title": "老金·邪修法则：CC每天自动获取25$额度Claude*多账号，Anyrouter全自动签到",
+          "read": 7873,
+          "like": 62
+        },
+        {
+          "title": "Gemini Cli一键安装及好用的使用策略",
+          "read": 3751,
+          "like": 76
+        }
+      ],
+      "recommendation": "🔥 强效规则，继续强化"
+    },
+    "number_shock": {
+      "name": "数字冲击",
+      "description": "标题含具体数字（倍数、百分比、金额等）",
+      "original_weight": 10,
+      "hit_count": 13,
+      "miss_count": 69,
+      "hit_rate": 15.9,
+      "avg_read_when_hit": 1762.0,
+      "avg_read_when_miss": 1240.0,
+      "effectiveness": 1.42,
+      "lift_vs_global": 33.2,
+      "top_3_hits": [
+        {
+          "title": "老金·邪修法则：CC每天自动获取25$额度Claude*多账号，Anyrouter全自动签到",
+          "read": 7873,
+          "like": 62
+        },
+        {
+          "title": "即梦AI推出无限画布，多模态创作一站式搞定，老金版三国摇滚10分钟产出！",
+          "read": 4602,
+          "like": 51
+        },
+        {
+          "title": "用AI打败AI，Claude Skills自建教程：3小时让AI按你的风格来办事",
+          "read": 3177,
+          "like": 65
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "efficiency_promise": {
+      "name": "效率承诺",
+      "description": "标题含一键/秒/分钟等效率词",
+      "original_weight": 10,
+      "hit_count": 9,
+      "miss_count": 73,
+      "hit_rate": 11.0,
+      "avg_read_when_hit": 2064.0,
+      "avg_read_when_miss": 1232.0,
+      "effectiveness": 1.68,
+      "lift_vs_global": 56.0,
+      "top_3_hits": [
+        {
+          "title": "老金·邪修法则：CC每天自动获取25$额度Claude*多账号，Anyrouter全自动签到",
+          "read": 7873,
+          "like": 62
+        },
+        {
+          "title": "Gemini Cli一键安装及好用的使用策略",
+          "read": 3751,
+          "like": 76
+        },
+        {
+          "title": "Cursor-Pro: 一键突破Claude-3.7限制的实用工具",
+          "read": 1571,
+          "like": 35
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "tutorial_word": {
+      "name": "教程词",
+      "description": "标题含手把手/教程/教你等词",
+      "original_weight": 15,
+      "hit_count": 15,
+      "miss_count": 67,
+      "hit_rate": 18.3,
+      "avg_read_when_hit": 2201.0,
+      "avg_read_when_miss": 1127.0,
+      "effectiveness": 1.95,
+      "lift_vs_global": 66.3,
+      "top_3_hits": [
+        {
+          "title": "Gemini Pro开始二次校验了？手把手教你怎么过",
+          "read": 16046,
+          "like": 191
+        },
+        {
+          "title": "用AI打败AI，Claude Skills自建教程：3小时让AI按你的风格来办事",
+          "read": 3177,
+          "like": 65
+        },
+        {
+          "title": "Claude Skills详解：最优雅的AI能力系统",
+          "read": 2702,
+          "like": 23
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "tool_word": {
+      "name": "工具词",
+      "description": "标题含神器/工具/利器等词",
+      "original_weight": 10,
+      "hit_count": 15,
+      "miss_count": 67,
+      "hit_rate": 18.3,
+      "avg_read_when_hit": 1800.0,
+      "avg_read_when_miss": 1216.0,
+      "effectiveness": 1.48,
+      "lift_vs_global": 36.1,
+      "top_3_hits": [
+        {
+          "title": "老金用AI写了半年代码才知道,原来一直少装了这个神器",
+          "read": 6599,
+          "like": 163
+        },
+        {
+          "title": "用AI打败AI，Claude Skills自建教程：3小时让AI按你的风格来办事",
+          "read": 3177,
+          "like": 65
+        },
+        {
+          "title": "Claude Skills详解：最优雅的AI能力系统",
+          "read": 2702,
+          "like": 23
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "emotion_word": {
+      "name": "情绪词",
+      "description": "标题含惊了/麻了/吓到/慌了等情绪词",
+      "original_weight": 10,
+      "hit_count": 2,
+      "miss_count": 80,
+      "hit_rate": 2.4,
+      "avg_read_when_hit": 431.0,
+      "avg_read_when_miss": 1345.0,
+      "effectiveness": 0.32,
+      "lift_vs_global": -67.4,
+      "top_3_hits": [
+        {
+          "title": "一句话做了个Coze？Gemini 3 Pro让我懵了",
+          "read": 862,
+          "like": 28
+        },
+        {
+          "title": "一句话做了个Coze？Gemini 3 Pro让我懵了",
+          "read": 0,
+          "like": 0
+        }
+      ],
+      "recommendation": "❌ 无效规则，考虑删除"
+    },
+    "question_mark": {
+      "name": "问号",
+      "description": "标题含问号（制造悬念）",
+      "original_weight": 5,
+      "hit_count": 19,
+      "miss_count": 63,
+      "hit_rate": 23.2,
+      "avg_read_when_hit": 1549.0,
+      "avg_read_when_miss": 1255.0,
+      "effectiveness": 1.23,
+      "lift_vs_global": 17.1,
+      "top_3_hits": [
+        {
+          "title": "Gemini Pro开始二次校验了？手把手教你怎么过",
+          "read": 16046,
+          "like": 191
+        },
+        {
+          "title": "不会编程也能做AI应用了？我试了Google这个新工具，10分钟干了设计师一天的活",
+          "read": 1856,
+          "like": 38
+        },
+        {
+          "title": "Claude Code中没用过Hooks？那你可真是丢了个神器",
+          "read": 1670,
+          "like": 38
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "fomo_word": {
+      "name": "FOMO词",
+      "description": "标题含99%/不知道/错过等FOMO词",
+      "original_weight": 15,
+      "hit_count": 0,
+      "miss_count": 82,
+      "hit_rate": 0.0,
+      "avg_read_when_hit": 0,
+      "avg_read_when_miss": 1323.0,
+      "effectiveness": 0.0,
+      "lift_vs_global": -100.0,
+      "top_3_hits": [],
+      "recommendation": "❌ 无效规则，考虑删除"
+    },
+    "time_word": {
+      "name": "时效词",
+      "description": "标题含昨晚/今天/刚刚等时效词",
+      "original_weight": 20,
+      "hit_count": 7,
+      "miss_count": 75,
+      "hit_rate": 8.5,
+      "avg_read_when_hit": 1214.0,
+      "avg_read_when_miss": 1333.0,
+      "effectiveness": 0.91,
+      "lift_vs_global": -8.2,
+      "top_3_hits": [
+        {
+          "title": "Kimi K2 0905 上线：Claude「翻桌子」后，CC 最像样的平替来了",
+          "read": 3448,
+          "like": 20
+        },
+        {
+          "title": "昨晚我把 Codex （插件扩展，非Cli）装进 Cursor，在 Windows 上跑了一夜",
+          "read": 1386,
+          "like": 15
+        },
+        {
+          "title": "DeepSeek-V3.2-Exp 发布，价格屠夫再次出手：API 打到地板价",
+          "read": 1072,
+          "like": 17
+        }
+      ],
+      "recommendation": "⚠️ 效果一般，需要优化"
+    },
+    "personal_word": {
+      "name": "个人视角",
+      "description": "标题含老金/我/才知道等个人视角词",
+      "original_weight": 10,
+      "hit_count": 36,
+      "miss_count": 46,
+      "hit_rate": 43.9,
+      "avg_read_when_hit": 1470.0,
+      "avg_read_when_miss": 1208.0,
+      "effectiveness": 1.22,
+      "lift_vs_global": 11.1,
+      "top_3_hits": [
+        {
+          "title": "老金·邪修法则：CC每天自动获取25$额度Claude*多账号，Anyrouter全自动签到",
+          "read": 7873,
+          "like": 62
+        },
+        {
+          "title": "老金用AI写了半年代码才知道,原来一直少装了这个神器",
+          "read": 6599,
+          "like": 163
+        },
+        {
+          "title": "即梦AI推出无限画布，多模态创作一站式搞定，老金版三国摇滚10分钟产出！",
+          "read": 4602,
+          "like": 51
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "title_length_optimal": {
+      "name": "标题长度最佳",
+      "description": "标题长度15-25字",
+      "original_weight": 5,
+      "hit_count": 18,
+      "miss_count": 64,
+      "hit_rate": 22.0,
+      "avg_read_when_hit": 742.0,
+      "avg_read_when_miss": 1487.0,
+      "effectiveness": 0.5,
+      "lift_vs_global": -43.9,
+      "top_3_hits": [
+        {
+          "title": "Gemini Cli一键安装及好用的使用策略",
+          "read": 3751,
+          "like": 76
+        },
+        {
+          "title": "Claude Code一键安装及白嫖方法",
+          "read": 1342,
+          "like": 33
+        },
+        {
+          "title": "Claude配置切换5分钟？这个工具让我5秒搞定",
+          "read": 1227,
+          "like": 25
+        }
+      ],
+      "recommendation": "❌ 无效规则，考虑删除"
+    },
+    "formula_pain_solve": {
+      "name": "痛点解决公式",
+      "description": "品牌词+问题+手把手教你",
+      "original_weight": 25,
+      "hit_count": 15,
+      "miss_count": 67,
+      "hit_rate": 18.3,
+      "avg_read_when_hit": 1950.0,
+      "avg_read_when_miss": 1183.0,
+      "effectiveness": 1.65,
+      "lift_vs_global": 47.4,
+      "top_3_hits": [
+        {
+          "title": "Gemini Pro开始二次校验了？手把手教你怎么过",
+          "read": 16046,
+          "like": 191
+        },
+        {
+          "title": "Cursor 1.0 官宣！老金手把手喂饭级教程说明！",
+          "read": 2361,
+          "like": 32
+        },
+        {
+          "title": "能动手操作浏览器的MCP！老金手把手教你使用BrowserTools！",
+          "read": 1950,
+          "like": 45
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "formula_tool_recommend": {
+      "name": "工具推荐公式",
+      "description": "用了X时间才知道+神器",
+      "original_weight": 20,
+      "hit_count": 1,
+      "miss_count": 81,
+      "hit_rate": 1.2,
+      "avg_read_when_hit": 6599.0,
+      "avg_read_when_miss": 1258.0,
+      "effectiveness": 5.25,
+      "lift_vs_global": 398.8,
+      "top_3_hits": [
+        {
+          "title": "老金用AI写了半年代码才知道,原来一直少装了这个神器",
+          "read": 6599,
+          "like": 163
+        }
+      ],
+      "recommendation": "✅ 有效规则，保持使用"
+    },
+    "formula_version_update": {
+      "name": "版本更新公式",
+      "description": "品牌词+版本号+解读/实测",
+      "original_weight": 15,
+      "hit_count": 29,
+      "miss_count": 53,
+      "hit_rate": 35.4,
+      "avg_read_when_hit": 1273.0,
+      "avg_read_when_miss": 1350.0,
+      "effectiveness": 0.94,
+      "lift_vs_global": -3.8,
+      "top_3_hits": [
+        {
+          "title": "老金·邪修法则：CC每天自动获取25$额度Claude*多账号，Anyrouter全自动签到",
+          "read": 7873,
+          "like": 62
+        },
+        {
+          "title": "Kimi K2 0905 上线：Claude「翻桌子」后，CC 最像样的平替来了",
+          "read": 3448,
+          "like": 20
+        },
+        {
+          "title": "用AI打败AI，Claude Skills自建教程：3小时让AI按你的风格来办事",
+          "read": 3177,
+          "like": 65
+        }
+      ],
+      "recommendation": "⚠️ 效果一般，需要优化"
+    }
+  },
+  "summary": {
+    "strong_rules": [
+      "brand_word",
+      "efficiency_promise",
+      "tutorial_word",
+      "formula_pain_solve",
+      "formula_tool_recommend"
+    ],
+    "effective_rules": [
+      "number_shock",
+      "tool_word",
+      "question_mark",
+      "personal_word"
+    ],
+    "weak_rules": [
+      "emotion_word",
+      "fomo_word",
+      "title_length_optimal"
+    ]
+  }
+}

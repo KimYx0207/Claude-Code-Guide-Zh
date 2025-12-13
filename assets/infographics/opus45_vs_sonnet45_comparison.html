@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Opus 4.5 vs Sonnet 4.5 对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f8f9fa;
+        }
+        th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 18px;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        th:first-child {
+            width: 30%;
+        }
+        td {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 16px;
+            color: #4a5568;
+        }
+        tr:hover {
+            background: #f7fafc;
+        }
+        .dimension {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 700;
+        }
+        .winner {
+            background: #f0fff4;
+            color: #22543d;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .loser {
+            color: #e53e3e;
+        }
+        .footer {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            text-align: center;
+            font-size: 14px;
+            color: #718096;
+        }
+        .star {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Claude Opus 4.5 vs Sonnet 4.5</h1>
+            <p>编程能力全方位对比</p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>对比维度</th>
+                    <th>Claude Opus 4.5</th>
+                    <th>Claude Sonnet 4.5</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="dimension">定价（Input）</td>
+                    <td><span class="loser">$5/M tokens</span></td>
+                    <td><span class="winner">$3/M tokens</span></td>
+                </tr>
+                <tr>
+                    <td class="dimension">定价（Output）</td>
+                    <td><span class="loser">$25/M tokens</span></td>
+                    <td><span class="winner">$15/M tokens</span></td>
+                </tr>
+                <tr>
+                    <td class="dimension">SWE-bench成绩</td>
+                    <td><span class="winner">80.9%</span> <span class="star">★</span></td>
+                    <td>77.2%</td>
+                </tr>
+                <tr>
+                    <td class="dimension">Token效率</td>
+                    <td><span class="winner">省76% output tokens</span> <span class="star">★</span></td>
+                    <td>标准</td>
+                </tr>
+                <tr>
+                    <td class="dimension">响应速度（首token）</td>
+                    <td><span class="loser">2.0-2.8秒</span></td>
+                    <td><span class="winner">1.2-1.8秒</span></td>
+                </tr>
+                <tr>
+                    <td class="dimension">TypeScript准确度</td>
+                    <td><span class="winner">95%+</span> <span class="star">★</span></td>
+                    <td>70%</td>
+                </tr>
+                <tr>
+                    <td class="dimension">Bug修复效率</td>
+                    <td><span class="winner">1次对话，8分钟</span> <span class="star">★</span></td>
+                    <td>4次对话，40分钟</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="footer">
+            数据来源：真实使用体验（API中转站） | 生成时间：2025-11-29
+        </div>
+    </div>
+</body>
+</html>

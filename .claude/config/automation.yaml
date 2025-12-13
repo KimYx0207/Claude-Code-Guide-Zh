@@ -1,0 +1,331 @@
+# 公众号自动化配置文件
+# 版本：V6.2.0
+# 更新日期：2025-12-05
+
+# ================================================
+# 热点扫描配置 (/hotspot)
+# ================================================
+hotspot:
+  # 数据源配置
+  sources:
+    github:
+      enabled: true
+      max_results: 10
+      filter_keywords:
+        - AI
+        - ML
+        - LLM
+        - GPT
+        - Claude
+        - Agent
+        - Cursor
+        - Copilot
+        - 编程
+        - 开发工具
+
+    hackernews:
+      enabled: true
+      max_results: 10
+      filter_keywords:
+        - AI
+        - machine learning
+        - LLM
+        - GPT
+        - Claude
+        - programming
+        - developer tools
+        - coding
+
+    news:
+      enabled: true
+      max_results: 10
+      search_service: google
+      time_range: day  # day/month/year
+      query: "AI 大模型 Claude GPT Gemini 发布 更新"
+
+  # 爆款评分配置
+  scoring:
+    dimensions:
+      - name: 时效性
+        weight: 5
+        criteria:
+          5: "12小时内"
+          4: "24小时内"
+          3: "48小时内"
+          2: "1周内"
+          1: "超过1周"
+
+      - name: 受众面
+        weight: 5
+        criteria:
+          5: "所有AI用户"
+          4: "技术人员"
+          3: "特定工具用户"
+          2: "小众群体"
+          1: "极小众"
+
+      - name: 实用性
+        weight: 5
+        criteria:
+          5: "立即可用"
+          4: "有参考价值"
+          3: "有启发"
+          2: "纯知识"
+          1: "无实用价值"
+
+      - name: 独特性
+        weight: 5
+        criteria:
+          5: "独家/首发"
+          4: "有独特角度"
+          3: "有差异化"
+          2: "普通角度"
+          1: "都在写"
+
+      - name: 情绪点
+        weight: 5
+        criteria:
+          5: "强共鸣/争议"
+          4: "有惊喜"
+          3: "有兴趣"
+          2: "平淡"
+          1: "无感"
+
+    # 评分阈值
+    thresholds:
+      must_write: 20      # >= 20分必写
+      worth_write: 15     # >= 15分值得写
+      can_write: 10       # >= 10分可写
+      skip: 10            # < 10分跳过
+
+# ================================================
+# 一键爆款配置 (/auto-baokuan)
+# ================================================
+auto_baokuan:
+  # 调研配置
+  research:
+    min_tools: 2          # 最少成功调用工具数
+    max_tools: 5          # 最多调用工具数
+    timeout: 60           # 超时时间（秒）
+
+    tools_priority:       # 工具优先级（从高到低）
+      - mcp__mcp-router__search
+      - mcp__mcp-router__brave_web_search
+      - mcp__mcp-router__news
+      - mcp__exa__web_search_exa
+      - mcp__context7__get_library_docs
+
+    fallback_tools:       # 备选工具
+      - WebSearch
+      - WebFetch
+
+  # 选题类型判断规则
+  topic_type_rules:
+    测评类:
+      keywords:
+        - 发布
+        - 更新
+        - 上线
+        - 新版
+        - 新功能
+        - 升级
+        - 重大
+        - 突破
+      template: "templates/测评类文章模板.md"
+      expected_reads: "5000-15000"
+
+    降价类:
+      keywords:
+        - 降价
+        - 优惠
+        - 折扣
+        - 限时
+        - 促销
+        - 打折
+        - 免费
+        - 赠送
+      template: "templates/降价类文章模板.md"
+      expected_reads: "4000-8000"
+
+    经验故事类:
+      keywords:
+        - 经验
+        - 心得
+        - 故事
+        - 踩坑
+        - 教训
+        - 分享
+        - 总结
+      template: "templates/经验故事类文章模板.md"
+      expected_reads: "4000-7000"
+      default: true       # 默认类型
+
+  # 写作配置
+  writing:
+    min_words: 1500
+    max_words: 4000
+    min_pitfalls: 3       # 最少踩坑数
+    title_count: 5        # 生成标题数量
+
+    style:
+      file: "prompts/laojin-style-v6-natural.md"
+      key_requirements:
+        - 口语化表达
+        - 具体时间线
+        - 真实案例
+        - 踩坑经历
+        - 逗号断句
+
+  # 质量检测配置
+  quality:
+    enabled: true
+    max_retries: 3        # 最大修正次数
+    auto_fix: true        # 自动修正
+
+    dimensions:
+      AI腔检测:
+        threshold: 20
+        direction: below  # 低于阈值为通过
+      自然度:
+        threshold: 80
+        direction: above  # 高于阈值为通过
+      真诚度:
+        threshold: 75
+        direction: above
+      啰嗦度:
+        threshold: 25
+        direction: below
+      重复度:
+        threshold: 15
+        direction: below
+        unit: "%"
+      可读性:
+        threshold: 85
+        direction: above
+      人味儿指数:
+        threshold: 70
+        direction: above
+      情感真实性:
+        threshold: 75
+        direction: above
+      脏话检测:
+        threshold: 0
+        direction: equal
+
+# ================================================
+# 每日扫描配置 (/daily-scan)
+# ================================================
+daily_scan:
+  # 文章生成配置
+  generation:
+    max_articles_per_day: 3     # 每天最多生成文章数
+    min_score_auto_write: 20    # 自动写作的最低分数
+    min_score_recommend: 15     # 推荐写作的最低分数
+
+  # 发布时间建议
+  publish_times:
+    morning: "08:00"
+    noon: "12:00"
+    evening: "20:00"
+
+  # 类型对应发布时间
+  type_publish_time:
+    测评类: "08:00"       # 早上发，抢时效
+    降价类: "12:00"       # 中午发，刺激购买
+    经验故事类: "20:00"   # 晚上发，适合深度阅读
+
+  # 报告配置
+  report:
+    include_stats: true
+    include_recommendations: true
+    include_next_steps: true
+
+# ================================================
+# 12大爆款标题公式
+# ================================================
+title_formulas:
+  - name: 时效+排名型
+    pattern: "昨晚/今天 + 上线/发布 + 就拿第一 + 核心卖点"
+    example: "昨晚上线就拿第一，100万token一口气读完"
+    expected_reads: "8000-15000"
+
+  - name: 降价冲击型
+    pattern: "产品名 + 降价数字 + 情绪词（麻了/惊了）"
+    example: "年付降价389，整个人都麻了"
+    expected_shares: "300-450+"
+
+  - name: 经验故事型
+    pattern: "时间维度 + 个人经历 + 才知道/才发现 + 价值点"
+    example: "用了4年AI，才知道这个窍门"
+    expected_reads: "5000-7000"
+
+  - name: 数字对比型
+    pattern: "产品A + 比B快/强X倍 + 具体场景"
+    example: "100万token，GPT只有它的1/5"
+    expected_reads: "3000-6000"
+
+  - name: FOMO型
+    pattern: "这个XX功能 + 99%的人不知道 + 价值点"
+    example: "这个AI功能，99%的人不知道"
+    expected_reads: "2000-5000"
+
+  - name: 踩坑避雷型
+    pattern: "用XX + 千万别XX + 后果"
+    example: "用Claude千万别这样提问，效果差10倍"
+    expected_reads: "3000-5000"
+
+  - name: 意外发现型
+    pattern: "深度体验后 + 我发现 + 意外结论"
+    example: "深度体验后，我发现Claude比GPT强的真正原因"
+    expected_reads: "4000-6000"
+
+  - name: 解决方案型
+    pattern: "XX问题 + 试试这X招 + 效果"
+    example: "AI回答总是废话？试试这3招"
+    expected_reads: "3000-5000"
+
+  - name: 争议观点型
+    pattern: "AI不会XX + 但XX会"
+    example: "AI不会让你失业，但会XX的人会"
+    expected_reads: "4000-7000"
+
+  - name: 时间成本型
+    pattern: "X分钟 + 学会XX + 效果"
+    example: "5分钟学会这个技巧，效率翻倍"
+    expected_reads: "2000-4000"
+
+  - name: 人群筛选型
+    pattern: "XX必看 + 核心价值"
+    example: "程序员必看：Claude Code这个功能绝了"
+    expected_reads: "3000-5000"
+
+  - name: 资源清单型
+    pattern: "X个XX + 我全测了 + 结论"
+    example: "5个AI编程工具，我全测了，只推荐这2个"
+    expected_reads: "4000-6000"
+
+# ================================================
+# 全局配置
+# ================================================
+global:
+  # 文件保存配置
+  output:
+    directory: "articles"
+    naming_pattern: "{date}-{keywords}.md"
+    encoding: "utf-8"
+
+  # API限制提醒
+  api_limits:
+    brave_search:
+      monthly_limit: 2000
+      warning_threshold: 1800
+    exa:
+      note: "有免费额度，珍惜使用"
+    open_websearch:
+      note: "完全免费无限制，优先使用"
+
+  # 日志配置
+  logging:
+    enabled: true
+    level: info
+    file: ".claude/logs/automation.log"

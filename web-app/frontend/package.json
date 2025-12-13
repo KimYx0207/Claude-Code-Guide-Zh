@@ -1,0 +1,31 @@
+{
+  "name": "gongzhonghao-writer-web",
+  "version": "1.0.0",
+  "description": "公众号写作助手Web版",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "@next/swc-win32-x64-msvc": "^15.5.7",
+    "axios": "^1.6.0",
+    "lucide-react": "^0.460.0",
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-hot-toast": "^2.6.0",
+    "recharts": "^2.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5"
+  }
+}

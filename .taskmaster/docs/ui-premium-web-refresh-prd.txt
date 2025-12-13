@@ -1,0 +1,82 @@
+产品需求文档（PRD）：Web UI 高端极简风（Modern Minimal Premium）改造
+
+背景
+- 当前 web-app/frontend 的视觉偏“炫酷科技感”（紫蓝渐变、玻璃拟态、漂浮光效、大面积渐变按钮与彩色卡片）。
+- 目标是将 Web 端升级为“全球审美最稳”的高端产品风格：克制、耐看、统一、可读性强、无障碍友好。
+
+目标（Outcome）
+1) 让首页与标题生成页呈现 Modern Minimal Premium（类似 Apple/Stripe 的克制产品风）。
+2) 建立可扩展的设计系统（Design Tokens + Tailwind 扩展 + 基础组件统一），为后续 /write /quality /data 等页面提供一致的高级风格底座。
+3) 降低动效与叠层的性能成本，支持 prefers-reduced-motion。
+
+非目标（Non-goals）
+- 本轮不做完整品牌视觉重塑（Logo/插画体系/营销视觉）。
+- 不引入大型组件库（保持当前轻量 UI 组件方式）。
+- 后端 API 功能不改动，仅修复前端请求路径不一致（如有）。
+
+设计原则（Design Principles）
+- 克制配色：以雾白/象牙白/浅灰为底，文字以深灰黑为主；强调色保持单一、低饱和；避免多彩大渐变。
+- 排版优先：清晰信息层级、留白、对齐、行高与字重一致。
+- 细节高级：边框更细、阴影更柔、hover 更轻、动画更少。
+- 可访问性：对比度达标、focus ring 清晰、支持 reduced motion。
+
+范围（Scope / Files）
+- web-app/frontend/app/globals.css
+- web-app/frontend/tailwind.config.js
+- web-app/frontend/app/layout.tsx
+- web-app/frontend/components/ui/button.tsx
+- web-app/frontend/components/ui/card.tsx
+- web-app/frontend/components/ui/input.tsx
+- web-app/frontend/app/page.tsx
+- web-app/frontend/app/title/page.tsx
+
+里程碑与任务拆分（Taskmaster should generate tasks）
+
+任务1：建立 Design Tokens + Tailwind 主题扩展（P0）
+- 在 globals.css 定义 tokens（bg/surface/text/muted/border/accent/ring/shadow/radius 等）。
+- 在 tailwind.config.js 扩展 colors/fontFamily/boxShadow/borderRadius 等指向 tokens。
+- 收敛或移除当前“漂浮光效/大渐变”背景，替换为更克制的高级底纹（可含极淡噪点/网格，禁止大范围动态光效）。
+验收标准：
+- 页面和组件不再写死 violet/blue 渐变色作为主视觉。
+- 主题切换（未来）只需改 tokens 即可。
+
+任务2：Typography 升级（P0）
+- layout.tsx 引入并应用字体组合：正文（Inter + 中文 Sans fallback），标题（中文 Serif，增加高级杂志感）。
+- 统一基础字号与行高策略（H1/H2/body/small）。
+验收标准：
+- 标题/正文层级清晰，长文本阅读不疲劳。
+
+任务3：基础组件高级化（P0）
+- Button：提供 primary/secondary/ghost/outline；统一 hover/active/disabled/focus ring；去掉大渐变。
+- Card：统一圆角/边框/阴影层级；hover 轻微抬升即可；去掉玻璃拟态依赖。
+- Input：统一边框与 focus ring；强调可读性；去掉紫色强存在感。
+验收标准：
+- Home 与 Title 页的按钮/输入/卡片风格一致、克制、耐看。
+
+任务4：首页升级为“产品落地页”风格（P1）
+- 去掉 emoji 图标，统一使用 lucide-react 线性图标。
+- Hero 更克制（留白、对齐、标题与副标题层级）。
+- Feature cards 改为统一面板风格（避免每卡一个彩色渐变块）。
+验收标准：
+- 截图观感接近成熟产品官网，而非“炫酷 Demo”。
+
+任务5：标题生成页升级为“报告式输出”风格（P1）
+- 结果卡片信息层级优化：排名/推荐不依赖彩色大渐变，使用克制徽标/边框/小标签。
+- Copy 操作提供清晰反馈（toast/snackbar/inline 状态）。
+- Loading 使用 skeleton/占位，提高质感。
+- 统一 API 调用路径（优先使用 Next rewrites：/api/...）。
+验收标准：
+- 结果区像专业报告，信息清晰；复制有反馈；loading 更高级。
+
+任务6：动效/性能/无障碍收口（P1）
+- 支持 prefers-reduced-motion（禁用或降级关键动画）。
+- 减少大面积 fixed 叠层与高频动画，优化滚动/交互顺滑度。
+- 基础对比度与 focus 可见性检查。
+验收标准：
+- reduced motion 下体验完整；交互顺滑；可读性明显提升。
+
+交付物（Deliverables）
+- 代码改动覆盖上述文件
+- 新增一份简短 UI 规范文档（docs 或 web-app/DEV_GUIDE.md 增补一节），说明 tokens、组件规范与使用方式
+
+
