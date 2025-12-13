@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -64,20 +64,42 @@ export default function Home() {
 // ============================================================
 
 function HomeTab() {
-  const [articles, setArticles] = useState([
-    { id: '2025-12-12_核心_热点_Cursor_Cursor2.2更新.md', title: 'Cursor2.2更新Debug Mode写前端的有福了', date: '2025-12-12', words: 3200, status: '草稿', qualityScore: null },
-    { id: '2025-12-09_核心_常青_Claude_老金用Claude.md', title: '老金用Claude半年才知道原来一直少装了这个省钱神器', date: '2025-12-09', words: 2800, status: '已发布', qualityScore: 82 },
-    { id: '2025-12-08_泛AI_常青_AI工具.md', title: 'AI工具对比评测', date: '2025-12-08', words: 1500, status: '草稿', qualityScore: 55 },
-  ]);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [articleSubTab, setArticleSubTab] = useState<'draft' | 'published'>('draft');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showSummary, setShowSummary] = useState(false);
   const [summary, setSummary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // 加载真实文章列表
+  useEffect(() => {
+    loadArticles();
+  }, []);
+
+  const loadArticles = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/articles/list');
+      const data = await res.json();
+
+      if (data.success) {
+        setArticles(data.data.articles);
+      }
+    } catch (error) {
+      console.error('加载文章列表失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 过滤文章（根据子Tab）
+  const filteredArticles = articles.filter(a => a.status === articleSubTab);
 
   const handleSelectAll = () => {
-    if (selected.size === articles.length) {
+    if (selected.size === filteredArticles.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(articles.map(a => a.id)));
+      setSelected(new Set(filteredArticles.map(a => a.id)));
     }
   };
 
@@ -178,7 +200,7 @@ function HomeTab() {
             <label className="flex items-center gap-2 text-sm text-gray-600">
               <input
                 type="checkbox"
-                checked={selected.size === articles.length && articles.length > 0}
+                checked={selected.size === filteredArticles.length && filteredArticles.length > 0}
                 onChange={handleSelectAll}
                 className="rounded"
               />
@@ -194,8 +216,38 @@ function HomeTab() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          {articles.map((article) => (
+        {/* 2个子Tab：已发布/草稿 */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setArticleSubTab('draft')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              articleSubTab === 'draft'
+                ? 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            📝 草稿 ({articles.filter(a => a.status === 'draft').length})
+          </button>
+          <button
+            onClick={() => setArticleSubTab('published')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              articleSubTab === 'published'
+                ? 'bg-green-100 text-green-700 border border-green-300'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            ✅ 已发布 ({articles.filter(a => a.status === 'published').length})
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+            <p className="text-gray-500">加载中...</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredArticles.map((article) => (
             <div key={article.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
                 <input
@@ -207,11 +259,29 @@ function HomeTab() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-2">{article.title}</h3>
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                    <span>{article.status}</span>
+                    <span className={article.status === 'published' ? 'text-green-600' : 'text-yellow-600'}>
+                      {article.status === 'published' ? '✅ 已发布' : '📝 草稿'}
+                    </span>
                     <span>·</span>
                     <span>{article.date}</span>
                     <span>·</span>
                     <span>{article.words}字</span>
+                    {article.category && (
+                      <>
+                        <span>·</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs">
+                          {article.category}
+                        </span>
+                      </>
+                    )}
+                    {article.brand && (
+                      <>
+                        <span>·</span>
+                        <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs">
+                          {article.brand}
+                        </span>
+                      </>
+                    )}
                   </div>
 
                   {/* 质检状态 */}
@@ -243,7 +313,16 @@ function HomeTab() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
+
+        {!loading && filteredArticles.length === 0 && (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <p className="text-gray-500">
+              {articleSubTab === 'draft' ? '暂无草稿文章' : '暂无已发布文章'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 批量质检汇总弹窗 */}

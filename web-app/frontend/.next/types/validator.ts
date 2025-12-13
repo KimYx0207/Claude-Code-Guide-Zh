@@ -137,6 +137,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/articles/list/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/articles/list">> = Specific
+  const handler = {} as typeof import("../../app/api/articles/list/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/quality/batch-check/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/quality/batch-check">> = Specific
