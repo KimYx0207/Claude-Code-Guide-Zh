@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-type TabView = 'home' | 'write';
+type TabView = 'home' | 'hotspot' | 'write' | 'data' | 'docs';
 
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<TabView>('home');
@@ -24,7 +24,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 2个Tab切换 */}
+          {/* 5个Tab切换 */}
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentTab('home')}
@@ -37,6 +37,16 @@ export default function Home() {
               🏠 首页
             </button>
             <button
+              onClick={() => setCurrentTab('hotspot')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                currentTab === 'hotspot'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              🔥 热点扫描
+            </button>
+            <button
               onClick={() => setCurrentTab('write')}
               className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 currentTab === 'write'
@@ -46,6 +56,26 @@ export default function Home() {
             >
               ✍️ 开始写作
             </button>
+            <button
+              onClick={() => setCurrentTab('data')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                currentTab === 'data'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              📊 数据分析
+            </button>
+            <button
+              onClick={() => setCurrentTab('docs')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                currentTab === 'docs'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              📚 教程资料
+            </button>
           </div>
         </div>
       </header>
@@ -53,7 +83,10 @@ export default function Home() {
       {/* 主内容区 */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         {currentTab === 'home' && <HomeTab />}
-        {currentTab === 'write' && <WriteTab />}
+        {currentTab === 'hotspot' && <HotspotTab />}
+        {currentTab === 'write' && <WriteTab setCurrentTab={setCurrentTab} />}
+        {currentTab === 'data' && <DataTab />}
+        {currentTab === 'docs' && <DocsTab />}
       </main>
     </div>
   );
@@ -388,7 +421,7 @@ function HomeTab() {
 // Tab 2: 写作（垂直布局，4个功能区）
 // ============================================================
 
-function WriteTab() {
+function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) {
   const [topic, setTopic] = useState('');
   const [topicResult, setTopicResult] = useState<any>(null);
   const [article, setArticle] = useState('');
@@ -627,6 +660,404 @@ function ScoreCard({
         {reverse ? '≤' : '≥'}{threshold}{isCount ? '处' : '分'}
         {isPassed ? ' ✅' : ' ❌'}
       </p>
+    </div>
+  );
+}
+
+// ============================================================
+// Tab 3: 热点扫描
+// ============================================================
+
+function HotspotTab() {
+  const [hotspots, setHotspots] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [scanDate, setScanDate] = useState('');
+
+  const handleScan = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/hotspot/scan');
+      const data = await res.json();
+
+      if (data.success) {
+        setHotspots(data.data.hotspots);
+        setScanDate(data.data.scanDate);
+      }
+    } catch (error) {
+      alert('扫描失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">🔥 AI热点扫描</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            自动抓取今日AI热点，评估爆款潜力
+          </p>
+        </div>
+        <Button onClick={handleScan} disabled={loading} className="bg-orange-600 hover:bg-orange-700">
+          {loading ? '扫描中...' : '🔍 扫描今日AI热点'}
+        </Button>
+      </div>
+
+      {scanDate && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-700">
+            📅 扫描时间：{scanDate} | 共找到 <strong>{hotspots.length}</strong> 条热点
+          </p>
+        </div>
+      )}
+
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mb-2"></div>
+          <p className="text-gray-500">正在扫描热点...</p>
+        </div>
+      )}
+
+      {!loading && hotspots.length > 0 && (
+        <div className="space-y-4">
+          {hotspots.map((item, idx) => (
+            <div key={idx} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 text-3xl">
+                  {item.score >= 4 ? '🔥🔥🔥' : item.score >= 3 ? '🔥🔥' : '🔥'}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+
+                  <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                    <div>
+                      <span className="text-gray-600">来源：</span>
+                      <span className="text-gray-900 font-medium">{item.source}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">时效性：</span>
+                      <span className={`font-medium ${item.timeliness === '今日' ? 'text-red-600' : 'text-orange-600'}`}>
+                        {item.timeliness}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">核心工具池：</span>
+                      <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 text-xs font-medium">
+                        {item.tool}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">爆款指数：</span>
+                      <span className="font-bold text-orange-600">
+                        {'⭐'.repeat(item.score)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {item.reason && (
+                    <div className="bg-yellow-50 rounded-lg p-3 mb-3">
+                      <p className="text-sm text-gray-700">
+                        <strong>推荐理由：</strong>{item.reason}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        // TODO: 跳转到写作Tab并预填主题
+                        alert('一键写作功能开发中');
+                      }}
+                    >
+                      ✍️ 一键写作
+                    </Button>
+                    <Button variant="outline">查看原文</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!loading && hotspots.length === 0 && scanDate && (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <p className="text-gray-500">今日暂无热点</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// Tab 4: 数据分析
+// ============================================================
+
+function DataTab() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/data/stats');
+      const data = await res.json();
+
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error('加载统计数据失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+        <p className="text-gray-500">加载数据中...</p>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+        <p className="text-gray-500">数据加载失败</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-900">📊 数据分析报告</h2>
+
+      {/* 总体统计 */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">总体统计</h3>
+        <div className="grid grid-cols-5 gap-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-sm text-gray-600 mb-1">总文章</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.total}篇</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-sm text-gray-600 mb-1">爆款率</p>
+            <p className="text-3xl font-bold text-blue-600">{stats.explosionRate}%</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-sm text-gray-600 mb-1">平均阅读</p>
+            <p className="text-3xl font-bold text-green-600">{stats.avgReads}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-sm text-gray-600 mb-1">核心工具类</p>
+            <p className="text-3xl font-bold text-purple-600">{stats.coreToolAvg}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-sm text-gray-600 mb-1">泛AI话题类</p>
+            <p className="text-3xl font-bold text-orange-600">{stats.generalAiAvg}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 爆款公式效果 */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">爆款公式效果（82篇数据验证）</h3>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="space-y-3">
+            {stats.formulas.map((formula: any, idx: number) => (
+              <div key={idx} className="flex items-center gap-4">
+                <div className="w-32 text-sm font-medium text-gray-700">{formula.name}</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-gray-100 rounded-full h-8 relative overflow-hidden">
+                      <div
+                        className={`h-full rounded-full flex items-center justify-end px-3 text-white text-sm font-bold ${
+                          formula.effectiveness >= 2 ? 'bg-red-600' :
+                          formula.effectiveness >= 1.5 ? 'bg-orange-500' :
+                          formula.effectiveness >= 1 ? 'bg-blue-500' :
+                          'bg-gray-400'
+                        }`}
+                        style={{ width: `${Math.min(formula.effectiveness * 20, 100)}%` }}
+                      >
+                        {formula.effectiveness.toFixed(2)}x
+                      </div>
+                    </div>
+                    <div className="w-24 text-sm text-gray-600">
+                      {formula.hitRate.toFixed(1)}% 命中
+                    </div>
+                  </div>
+                </div>
+                {formula.status && (
+                  <div className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">
+                    {formula.status}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              * 效果值 = (命中时平均阅读) / (未命中时平均阅读)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 品牌词统计 */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">核心工具池品牌词统计</h3>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="grid grid-cols-3 gap-4">
+            {stats.brands.slice(0, 6).map((brand: any, idx: number) => (
+              <div key={idx} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900">{brand.name}</span>
+                  <span className="text-2xl font-bold text-blue-600">{brand.count}</span>
+                </div>
+                <div className="text-xs text-gray-600">
+                  平均阅读：<span className="font-semibold">{brand.avgReads}</span>
+                </div>
+                <div className="mt-2 bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-blue-600 h-full"
+                    style={{ width: `${(brand.count / stats.brands[0].count) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Tab 5: 教程资料
+// ============================================================
+
+function DocsTab() {
+  const [docTree, setDocTree] = useState<any[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string>('');
+  const [fileContent, setFileContent] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [contentLoading, setContentLoading] = useState(false);
+
+  useEffect(() => {
+    loadDocTree();
+  }, []);
+
+  const loadDocTree = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/docs/list');
+      const data = await res.json();
+
+      if (data.success) {
+        setDocTree(data.data.tree);
+      }
+    } catch (error) {
+      console.error('加载文档树失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFileContent = async (filePath: string) => {
+    setContentLoading(true);
+    try {
+      const res = await fetch('/api/docs/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setFileContent(data.data.content);
+        setSelectedFile(filePath);
+      }
+    } catch (error) {
+      alert('加载文档失败');
+    } finally {
+      setContentLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+        <p className="text-gray-500">加载文档树中...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-900">📚 Claude Code 教程资料包</h2>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* 左侧：文档树 */}
+        <div className="col-span-4 bg-white rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+          <h3 className="font-semibold text-gray-900 mb-4">文档目录</h3>
+          <div className="space-y-2">
+            {docTree.map((folder, idx) => (
+              <div key={idx}>
+                <div className="font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <span className="text-blue-600">📁</span>
+                  {folder.name}
+                </div>
+                <div className="ml-6 space-y-1">
+                  {folder.files.map((file: string, fileIdx: number) => (
+                    <button
+                      key={fileIdx}
+                      onClick={() => loadFileContent(`${folder.path}/${file}`)}
+                      className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-blue-50 transition-colors ${
+                        selectedFile === `${folder.path}/${file}` ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-600'
+                      }`}
+                    >
+                      📄 {file}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 右侧：文档内容 */}
+        <div className="col-span-8 bg-white rounded-lg border border-gray-200 p-6 max-h-[calc(100vh-300px)] overflow-y-auto">
+          {contentLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-2"></div>
+              <p className="text-gray-500">加载中...</p>
+            </div>
+          ) : selectedFile ? (
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{selectedFile.split('/').pop()}</h3>
+              <div className="prose prose-sm max-w-none">
+                <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+                  {fileContent}
+                </pre>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">请从左侧选择文档查看</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

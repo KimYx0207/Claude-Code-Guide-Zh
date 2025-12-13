@@ -146,6 +146,42 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/data/stats/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/data/stats">> = Specific
+  const handler = {} as typeof import("../../app/api/data/stats/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/docs/content/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/docs/content">> = Specific
+  const handler = {} as typeof import("../../app/api/docs/content/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/docs/list/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/docs/list">> = Specific
+  const handler = {} as typeof import("../../app/api/docs/list/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/hotspot/scan/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/hotspot/scan">> = Specific
+  const handler = {} as typeof import("../../app/api/hotspot/scan/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/quality/batch-check/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/quality/batch-check">> = Specific
