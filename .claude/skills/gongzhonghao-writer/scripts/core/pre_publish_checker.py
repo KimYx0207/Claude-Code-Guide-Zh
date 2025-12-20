@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-发文前检查清单 - 基于老金公众号爆款数据分析
+发文前检查器 V9.0 - 配置驱动版
 确保文章满足爆款必要条件后再发布
-
-根据 data/2025-12-08_数据分析/爆款规律深度分析.md 的3个必要条件：
-1. 踩中真实痛点
-2. 时效性（热点24小时内）
-3. 标题含品牌词+动作词
 """
+
+import sys
+from pathlib import Path
+
+# 添加config目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from config.loader import load_config
 
 import re
 import json
@@ -40,35 +42,29 @@ class CheckResult:
 
 
 class PrePublishChecker:
-    """发文前检查器"""
-
-    # 品牌词库
-    BRAND_WORDS = [
-        "Claude", "Cursor", "Gemini", "GPT", "ChatGPT",
-        "Copilot", "Windsurf", "Bolt", "v0", "Kimi",
-        "DeepSeek", "通义", "文心", "豆包", "Ollama"
-    ]
-
-    # 动作词库
-    ACTION_WORDS = ["手把手", "教你", "教程", "攻略", "指南", "实战", "一键", "秒"]
-
-    # 情绪词库
-    EMOTION_WORDS = ["神器", "强", "绝了", "真香", "爆", "牛逼", "炸裂", "终于"]
-
-    # 痛点关键词
-    PAIN_POINTS = [
-        "问题", "报错", "失败", "不能", "无法", "限制", "卡住",
-        "怎么办", "如何解决", "解决方案", "踩坑", "避坑"
-    ]
-
-    # 时效性关键词
-    TIMELY_WORDS = [
-        "更新", "发布", "上线", "新版", "刚刚", "今天", "昨天",
-        "最新", "首发", "抢先", "第一时间"
-    ]
+    """发文前检查器 V9.0 - 配置驱动"""
 
     def __init__(self, articles_dir: str = "articles"):
+        """初始化：从配置加载检查规则"""
         self.articles_dir = Path(articles_dir)
+
+        # 加载配置
+        brands_config = load_config('brands_config')
+        quality_config = load_config('quality_config')
+
+        # 从配置加载词库
+        self.BRAND_WORDS = self._load_brands(brands_config)
+        self.ACTION_WORDS = quality_config.get('action_words', {}).get('high', []) + \
+                           quality_config.get('action_words', {}).get('mid', [])
+        self.PAIN_POINTS = quality_config.get('pre_publish', {}).get('pain_points', ["问题", "报错"])
+        self.TIMELY_WORDS = quality_config.get('pre_publish', {}).get('timely_words', ["更新", "发布"])
+        self.EMOTION_WORDS = quality_config.get('pre_publish', {}).get('emotion_words', ["神器", "绝了", "真香"])
+
+    def _load_brands(self, config):
+        """加载品牌词"""
+        brands = config.get('core_brands', {})
+        all_brands = brands.get('s_tier', []) + brands.get('a_tier', [])
+        return all_brands if all_brands else ["Claude", "Cursor", "Gemini"]
 
     def check(
         self,
@@ -448,6 +444,12 @@ class PrePublishChecker:
 def main():
     """命令行入口"""
     import sys
+
+    # 强制UTF-8输出，避免Windows下中文报错
+    if sys.stdout.encoding != 'utf-8':
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
     if len(sys.argv) < 2:
         print("用法: python pre_publish_checker.py <文章文件路径>")

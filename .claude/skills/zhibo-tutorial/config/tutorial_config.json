@@ -1,0 +1,168 @@
+{
+  "version": "2.0",
+  "updated": "2025-12-17",
+  "description": "直播教程写作规范配置",
+
+  "quality_standards": {
+    "terminology": {
+      "min_count": 10,
+      "max_count": 20,
+      "required_fields": ["英文全称", "通俗解释", "生活类比"],
+      "description": "术语表必须有10-20个术语，每个都要有英文全称、通俗解释和生活类比"
+    },
+
+    "verification": {
+      "required_per_install_step": true,
+      "must_have_expected_output": true,
+      "must_have_error_handling": true,
+      "description": "每个安装步骤后必须有验证方法、预期输出和错误处理"
+    },
+
+    "structure": {
+      "required_sections": [
+        "课程信息",
+        "学习目标",
+        "术语表",
+        "常见问题",
+        "总结"
+      ],
+      "description": "文档必须包含这些章节"
+    },
+
+    "format": {
+      "use_standard_markdown": true,
+      "allow_tables": true,
+      "allow_horizontal_rule": true,
+      "code_block_with_language": true,
+      "cross_platform_commands_separate": true,
+      "description": "标准Markdown格式：允许表格、分隔线，代码块必须标注语言"
+    }
+  },
+
+  "markers": {
+    "tip": "💡 **说明**",
+    "warning": "⚠️ **注意**",
+    "error": "❌ **错误做法**",
+    "correct": "✅ **正确做法**",
+    "source": "📌 **信息来源**",
+    "key": "🎯 **关键点**",
+    "question": "🤔 **你可能会问**"
+  },
+
+  "template_types": {
+    "installation": {
+      "name": "安装配置类教程",
+      "sections": [
+        "简介与价值",
+        "系统要求检查",
+        "核心安装步骤",
+        "配置与认证",
+        "Hello World验证",
+        "常见问题",
+        "总结与速查表"
+      ]
+    },
+    "feature": {
+      "name": "功能使用类教程",
+      "sections": [
+        "功能概述",
+        "快速开始",
+        "核心功能详解",
+        "高级用法",
+        "最佳实践",
+        "常见问题",
+        "总结与速查表"
+      ]
+    }
+  },
+
+  "terminology_library": {
+    "common_terms": [
+      {
+        "term": "CLI",
+        "full_name": "Command Line Interface",
+        "explanation": "命令行界面，通过打字操作电脑",
+        "analogy": "像发短信一样和电脑\"聊天\""
+      },
+      {
+        "term": "API",
+        "full_name": "Application Programming Interface",
+        "explanation": "应用程序接口，软件之间\"对话\"的方式",
+        "analogy": "像餐厅的菜单，告诉你能点什么"
+      },
+      {
+        "term": "Token",
+        "full_name": "Token",
+        "explanation": "AI处理文字的计费单位",
+        "analogy": "像手机流量，用多少算多少钱"
+      },
+      {
+        "term": "npm",
+        "full_name": "Node Package Manager",
+        "explanation": "Node.js的包管理器",
+        "analogy": "像应用商店，下载安装各种工具"
+      },
+      {
+        "term": "LTS",
+        "full_name": "Long Term Support",
+        "explanation": "长期支持版本，稳定可靠",
+        "analogy": "像iPhone的\"稳定版\"系统，更新少但不容易出问题"
+      },
+      {
+        "term": "环境变量",
+        "full_name": "Environment Variable",
+        "explanation": "操作系统级别的配置项",
+        "analogy": "电脑的\"备忘录\"，存储重要信息"
+      },
+      {
+        "term": "终端",
+        "full_name": "Terminal",
+        "explanation": "运行命令行的程序窗口",
+        "analogy": "和电脑\"对话\"的窗口"
+      },
+      {
+        "term": "PATH",
+        "full_name": "PATH",
+        "explanation": "系统环境变量之一，告诉电脑去哪里找可执行程序",
+        "analogy": "像手机的\"快捷方式\"，让你快速找到App"
+      },
+      {
+        "term": "全局安装",
+        "full_name": "Global Install",
+        "explanation": "安装后在电脑任何位置都能使用",
+        "analogy": "像系统自带的App，哪里都能用"
+      },
+      {
+        "term": "API Key",
+        "full_name": "API Key",
+        "explanation": "API密钥，类似\"通行证\"",
+        "analogy": "像会员卡，证明你有权使用某个服务"
+      }
+    ]
+  },
+
+  "websearch_templates": {
+    "version": "[软件名] latest stable version 2025",
+    "installation": "[软件名] official installation guide",
+    "errors": "[软件名] common installation errors solutions",
+    "china_mirror": "[软件名] 国内安装 镜像"
+  },
+
+  "difficulty_levels": {
+    "beginner": {
+      "icon": "⭐",
+      "name": "零基础入门",
+      "description": "完全不需要技术背景"
+    },
+    "elementary": {
+      "icon": "⭐⭐",
+      "name": "入门级",
+      "description": "需要基本的电脑操作能力"
+    },
+    "intermediate": {
+      "icon": "⭐⭐⭐",
+      "name": "进阶",
+      "description": "需要一定的编程基础"
+    }
+  }
+}

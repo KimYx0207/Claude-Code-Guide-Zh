@@ -1,0 +1,81 @@
+{
+  "version": "V9.0",
+  "last_updated": "2025-12-20",
+  "description": "品牌配置 V9.0 - 增加生态关键词和三层分类",
+
+  "core_brands": {
+    "s_tier": ["Claude", "Cursor", "Gemini", "GPT", "ChatGPT", "Google", "Kimi", "DeepSeek"],
+    "a_tier": ["Copilot", "Windsurf", "v0", "Bolt", "Coze", "MiniMax", "即梦", "Codex"],
+    "b_tier": ["Ollama", "Mistral", "LLaMA", "Qwen", "通义"]
+  },
+
+  "core_tools": {
+    "Kimi/月之暗面": 3448,
+    "Google/Gemini": 3146,
+    "ByteDance/即梦": 2927,
+    "Anthropic/Claude": 2118,
+    "Cursor": 1246,
+    "Codex": 1199,
+    "DeepSeek": 1100,
+    "ChatGPT/OpenAI": 1500
+  },
+
+  "ecosystem_keywords": {
+    "_description": "GitHub生态项目识别关键词",
+    "Claude生态": {
+      "prefixes": ["claude-", "anthropic-", "mcp-"],
+      "keywords": ["claude code", "claude skills", "claude hooks", "claude mcp"],
+      "related_projects": ["browsertools", "filesystem-mcp", "github-mcp"]
+    },
+    "Cursor生态": {
+      "prefixes": ["cursor-", "cursorless-"],
+      "keywords": ["cursor extension", "cursor plugin", "cursor pro"],
+      "related_projects": ["cursor-pro", "cursor-rules"]
+    },
+    "Gemini生态": {
+      "prefixes": ["gemini-", "google-ai-"],
+      "keywords": ["gemini cli", "gemini api", "gemini sdk"],
+      "related_projects": ["gemini-cli", "aistudio-"]
+    },
+    "OpenAI生态": {
+      "prefixes": ["openai-", "gpt-", "codex-"],
+      "keywords": ["codex cli", "gpt api", "openai sdk"],
+      "related_projects": ["codex-cli", "chatgpt-"]
+    }
+  },
+
+  "topic_classification": {
+    "layer1_official": {
+      "name": "核心工具官方",
+      "avg_reads": 2000,
+      "viral_rate": "71%",
+      "strategy": "稳定高流量，优先写"
+    },
+    "layer2_ecosystem": {
+      "name": "核心工具生态",
+      "avg_reads": 1500,
+      "viral_rate": "24%",
+      "strategy": "解决痛点，推荐写"
+    },
+    "layer3_general": {
+      "name": "泛AI话题",
+      "avg_reads": 908,
+      "viral_rate": "5%",
+      "strategy": "需要独特角度，谨慎写"
+    }
+  },
+
+  "topic_types": {
+    "工具型": {"weight": 1.5, "keywords": ["神器", "工具", "插件", "扩展"]},
+    "教程型": {"weight": 1.4, "keywords": ["手把手", "教你", "教程", "入门"]},
+    "热点型": {"weight": 1.6, "keywords": ["发布", "更新", "官宣", "首发"]},
+    "测评型": {"weight": 1.2, "keywords": ["测评", "对比", "实测", "体验"]},
+    "羊毛型": {"weight": 1.3, "keywords": ["免费", "白嫖", "薅羊毛", "省钱"]},
+    "痛点型": {"weight": 1.4, "keywords": ["解决", "报错", "问题", "修复"]}
+  },
+
+  "timeliness": {
+    "hot_keywords": ["发布", "上线", "更新", "官宣", "刚刚", "今天", "最新"],
+    "evergreen_keywords": ["教程", "入门", "指南", "详解", "原理", "最佳实践"]
+  }
+}

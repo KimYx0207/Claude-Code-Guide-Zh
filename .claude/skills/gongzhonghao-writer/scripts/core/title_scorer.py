@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-标题评分器 V7.1 - 基于82篇文章数据验证
+标题评分器 V9.0 - 配置驱动版
 输入标题，输出爆款概率评分（0-100分）
-
-根据 data/rule_validation_report.json 的验证结果更新（2025-12-09）
-核心发现（按effectiveness排序）：
-- 工具推荐公式: 5.25x（最强！用了X时间才知道+神器）
-- 教程词(手把手/教程): 1.95x, lift +66.3%
-- 效率承诺(一键/秒): 1.68x, lift +56.0%
-- 痛点解决公式: 1.65x, lift +47.4%
-- 品牌词(Claude/Cursor): 1.59x, lift +16.3%
-
-⚠️ 无效规则（已删除评分）：
-- 情绪词(惊了/麻了): 0.32x 负相关！
-- FOMO词(99%不知道): 0.00x 零命中！
-- 标题长度15-25字: 0.50x 反向指标！
 """
 
 import re
+import sys
 from typing import Dict, List, Tuple
 from dataclasses import dataclass
+from pathlib import Path
+
+# 添加config目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from config.loader import load_config
 
 
 @dataclass
@@ -33,64 +26,75 @@ class ScoreItem:
 
 
 class TitleScorer:
-    """标题评分器"""
-
-    # 品牌词库（按热度排序）
-    # V7.1更新：区分国际+国内市场，国内头部产品同样是S级
-    BRAND_WORDS = {
-        "S级": [
-            # 国际头部
-            "Claude", "Cursor", "GPT", "ChatGPT", "Gemini", "Google", "OpenAI", "Anthropic",
-            # 国内头部（月活过亿/垂直天花板）
-            "DeepSeek", "豆包", "Doubao", "通义", "Qwen", "千问", "Kimi", "智谱", "ChatGLM",
-            # 视频生成天花板
-            "可灵", "Kling", "即梦", "海螺", "MiniMax", "Suno", "Midjourney", "Runway",
-        ],
-        "A级": [
-            # 国际知名
-            "Copilot", "v0", "Bolt", "Windsurf", "Perplexity", "Lovart", "Pika", "Luma",
-            # 国内知名
-            "文心", "ERNIE", "百度", "腾讯混元", "讯飞", "月之暗面", "零一万物", "Yi",
-            "Vidu", "PixVerse", "清影", "通义万相",
-        ],
-        "B级": ["Ollama", "LLaMA", "Mistral", "Stable Diffusion", "SDXL", "Flux"],
-    }
-
-    # 动作词库
-    ACTION_WORDS = {
-        "强": ["手把手", "教你怎么", "完整教程"],  # 强动作词 +15分
-        "中": ["教程", "攻略", "指南", "教你"],    # 中动作词 +10分
-        "弱": ["分享", "介绍", "说说"],            # 弱动作词 +5分
-    }
-
-    # 效率词库
-    SPEED_WORDS = ["一键", "秒", "分钟", "3步", "5步", "快速", "立即", "马上"]
-
-    # 情绪词库 - V7.1更新：数据显示情绪词effectiveness=0.32x（负相关）
-    # 保留检测但不再正向评分，仅作为风险提示
-    EMOTION_WORDS = {
-        "强": ["神器", "炸裂", "牛逼", "绝了", "真香", "爆"],  # 神器保留（属于工具词，有效）
-        "中": ["强", "好用", "推荐", "必看"],
-        "弱": ["不错", "还行", "可以"],
-    }
-
-    # V7.1新增：工具推荐公式关键词（effectiveness=5.25x，最强！）
-    TOOL_RECOMMEND_PATTERNS = [
-        r"用.{1,10}(才知道|才发现)",  # "用了半年才知道"
-        r"一直(少|没|缺)",  # "一直少装了"
-    ]
-
-    # 问题解决词
-    PROBLEM_WORDS = ["？", "?", "怎么", "如何", "解决", "搞定", "修复"]
-
-    # 数字模式
-    NUMBER_PATTERN = r"\d+"
-
-    # 版本号模式
-    VERSION_PATTERN = r"[vV]?\d+\.?\d*\.?\d*"
+    """标题评分器（V8.0配置驱动）"""
 
     def __init__(self):
+        """初始化：从配置加载所有规则"""
+        # 加载配置
+        self.brands_config = load_config('brands_config')
+        self.quality_config = load_config('quality_config')
+        self.formulas_config = load_config('formulas_config')
+
+        # 品牌词库（从配置加载）
+        self.brand_words = self._load_brands()
+
+        # 评分规则（从配置加载）
+        self.tier_scores = self.quality_config.get('title_scorer', {}).get('tier_scores', {'S': 35, 'A': 25, 'B': 15})
+
         self.score_items: List[ScoreItem] = []
+
+    def _load_brands(self) -> Dict[str, List[str]]:
+        """从配置加载品牌分层"""
+        brands = self.brands_config.get('core_brands', {})
+        return {
+            'S级': brands.get('s_tier', ["Claude", "Cursor", "Gemini", "GPT"]),
+            'A级': brands.get('a_tier', ["Copilot", "v0", "Bolt"]),
+            'B级': brands.get('b_tier', ["Ollama", "Mistral"])
+        }
+
+    @property
+    def BRAND_WORDS(self):
+        return self.brand_words
+
+    @property
+    def ACTION_WORDS(self):
+        return self.quality_config.get('action_words', {
+            "强": ["手把手", "教你怎么"],
+            "中": ["教程", "攻略"],
+            "弱": ["分享", "介绍"]
+        })
+
+    @property
+    def SPEED_WORDS(self):
+        return self.quality_config.get('title_scorer', {}).get('speed_words', ["一键", "秒", "分钟"])
+
+    @property
+    def PROBLEM_WORDS(self):
+        return self.quality_config.get('title_scorer', {}).get('problem_words', ["？", "如何", "解决"])
+
+    @property
+    def NUMBER_PATTERN(self):
+        return self.quality_config.get('title_scorer', {}).get('number_pattern', r"\d+")
+
+    @property
+    def VERSION_PATTERN(self):
+        return self.quality_config.get('title_scorer', {}).get('version_pattern', r"[vV]?\d+\.?\d*\.?\d*")
+
+    @property
+    def EMOTION_WORDS(self):
+        return self.quality_config.get('title_scorer', {}).get('emotion_words', {
+            "强": ["绝了", "真香"],
+            "中": ["好用", "推荐"],
+            "弱": ["还行", "可以"]
+        })
+
+    @property
+    def TOOL_RECOMMEND_PATTERNS(self):
+        return self.quality_config.get('title_scorer', {}).get('tool_recommend_patterns', [
+            r"用.{1,10}(才知道|才发现)",
+            r"一直少",
+            r"原来.*神器"
+        ])
 
     def score(self, title: str) -> Dict:
         """

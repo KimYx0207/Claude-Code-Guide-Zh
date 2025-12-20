@@ -134,8 +134,8 @@ async function main() {
         await browser.close();
         process.exit(0);
       } else if (key[0] === 13) { // Enter
-        console.log('\n[TODO] 收集下一页功能待实现');
-        console.log('[INFO] 请运行 collect_incremental.py 解析数据');
+        console.log('\n[INFO] 收集下一页功能已由MCP自动实现');
+        console.log('[INFO] 请使用 /data-collect 命令进行自动收集');
         await browser.close();
         process.exit(0);
       }

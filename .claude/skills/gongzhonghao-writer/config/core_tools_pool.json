@@ -1,0 +1,252 @@
+{
+  "_meta": {
+    "version": "V9.0",
+    "description": "核心工具池配置 - 三层架构：官方工具 > 生态项目 > 泛AI话题",
+    "updated": "2025-12-20",
+    "data_source": "历史文章分析验证"
+  },
+
+  "layer1_official": {
+    "_description": "核心工具官方：稳定高流量，71%爆款来源",
+    "tools": {
+      "Claude": {
+        "avg_reads": 2118,
+        "tier": "S",
+        "monitor_sources": [
+          "https://www.anthropic.com/news",
+          "https://docs.anthropic.com/changelog",
+          "https://github.com/anthropics/claude-code/releases"
+        ],
+        "keywords": ["claude", "anthropic", "claude code", "claude max", "opus", "sonnet"],
+        "ecosystem_prefix": ["claude-", "anthropic-", "mcp-"]
+      },
+      "Cursor": {
+        "avg_reads": 1246,
+        "tier": "S",
+        "monitor_sources": [
+          "https://cursor.com/changelog",
+          "https://forum.cursor.com",
+          "Discord: cursor"
+        ],
+        "keywords": ["cursor", "cursor pro", "cursor ai"],
+        "ecosystem_prefix": ["cursor-", "cursorless-"]
+      },
+      "Gemini": {
+        "avg_reads": 3146,
+        "tier": "S",
+        "monitor_sources": [
+          "https://blog.google/technology/ai",
+          "https://ai.google.dev/changelog",
+          "https://github.com/google-gemini"
+        ],
+        "keywords": ["gemini", "google ai", "gemini pro", "gemini cli"],
+        "ecosystem_prefix": ["gemini-", "google-ai-"]
+      },
+      "Kimi": {
+        "avg_reads": 3448,
+        "tier": "S",
+        "monitor_sources": [
+          "https://kimi.moonshot.cn",
+          "Moonshot官方公众号"
+        ],
+        "keywords": ["kimi", "moonshot", "月之暗面"],
+        "ecosystem_prefix": ["kimi-", "moonshot-"]
+      },
+      "即梦": {
+        "avg_reads": 2927,
+        "tier": "A",
+        "monitor_sources": [
+          "https://jimeng.jianying.com",
+          "即梦官方公众号"
+        ],
+        "keywords": ["即梦", "jimeng", "剪映"],
+        "ecosystem_prefix": []
+      },
+      "ChatGPT": {
+        "avg_reads": 1500,
+        "tier": "A",
+        "monitor_sources": [
+          "https://openai.com/blog",
+          "https://platform.openai.com/docs/changelog"
+        ],
+        "keywords": ["chatgpt", "gpt-4", "gpt-5", "openai"],
+        "ecosystem_prefix": ["openai-", "gpt-"]
+      },
+      "Codex": {
+        "avg_reads": 1199,
+        "tier": "A",
+        "monitor_sources": [
+          "https://github.com/openai/codex",
+          "OpenAI官方"
+        ],
+        "keywords": ["codex", "codex cli"],
+        "ecosystem_prefix": ["codex-"]
+      },
+      "DeepSeek": {
+        "avg_reads": 1100,
+        "tier": "A",
+        "monitor_sources": [
+          "https://www.deepseek.com",
+          "https://github.com/deepseek-ai"
+        ],
+        "keywords": ["deepseek", "deep seek"],
+        "ecosystem_prefix": ["deepseek-"]
+      }
+    }
+  },
+
+  "layer2_ecosystem": {
+    "_description": "核心工具生态：GitHub上围绕核心工具的项目，24%爆款来源",
+    "categories": {
+      "MCP服务器": {
+        "description": "Model Context Protocol服务器",
+        "keywords": ["mcp", "mcp-server", "model-context-protocol"],
+        "examples": ["browsertools-mcp", "filesystem-mcp", "github-mcp"],
+        "related_tools": ["Claude"],
+        "avg_reads": 1580
+      },
+      "IDE插件": {
+        "description": "IDE集成插件",
+        "keywords": ["vscode-", "jetbrains-", "-extension", "-plugin"],
+        "examples": ["cursor-pro", "codex-extension"],
+        "related_tools": ["Cursor", "Codex"],
+        "avg_reads": 1450
+      },
+      "CLI工具": {
+        "description": "命令行工具扩展",
+        "keywords": ["-cli", "terminal-", "shell-"],
+        "examples": ["gemini-cli", "claude-cli"],
+        "related_tools": ["Gemini", "Claude"],
+        "avg_reads": 1400
+      },
+      "Skills/Plugins": {
+        "description": "Claude Skills和插件系统",
+        "keywords": ["skills", "claude-skills", "plugins"],
+        "examples": ["awesome-claude-skills"],
+        "related_tools": ["Claude"],
+        "avg_reads": 1650
+      },
+      "自动化脚本": {
+        "description": "提效脚本和自动化工具",
+        "keywords": ["automation", "script", "workflow"],
+        "examples": ["auto-commit", "batch-process"],
+        "related_tools": ["Claude", "Cursor"],
+        "avg_reads": 1300
+      }
+    },
+    "github_filter_rules": {
+      "must_contain_any": [
+        "claude", "cursor", "gemini", "gpt", "openai", "anthropic",
+        "mcp", "copilot", "ai-coding", "llm"
+      ],
+      "exclude_keywords": [
+        "awesome-list-only", "deprecated", "archived"
+      ],
+      "min_stars": 50,
+      "max_age_days": 30
+    }
+  },
+
+  "layer3_general": {
+    "_description": "泛AI话题：需要独特角度才能火，5%爆款来源",
+    "categories": {
+      "行业动态": {
+        "keywords": ["融资", "估值", "收购", "上市"],
+        "risk": "high",
+        "avg_reads": 908
+      },
+      "AI趋势": {
+        "keywords": ["替代", "失业", "未来", "变革"],
+        "risk": "high",
+        "avg_reads": 750
+      },
+      "技术概念": {
+        "keywords": ["agent", "rag", "prompt", "embedding"],
+        "risk": "medium",
+        "avg_reads": 850
+      }
+    },
+    "warning": "泛AI话题平均阅读908，建议关联核心工具或找独特角度"
+  },
+
+  "timeliness_rules": {
+    "_description": "时效性判断规则",
+    "hot_signals": {
+      "immediate": {
+        "keywords": ["刚刚", "今天", "发布", "上线", "官宣", "breaking"],
+        "window_hours": 24,
+        "priority_boost": 2.0
+      },
+      "recent": {
+        "keywords": ["最新", "更新", "新版", "升级"],
+        "window_hours": 72,
+        "priority_boost": 1.5
+      },
+      "version": {
+        "pattern": "[vV]?\\d+\\.\\d+(\\.\\d+)?",
+        "priority_boost": 1.3
+      }
+    },
+    "evergreen": {
+      "keywords": ["教程", "入门", "指南", "详解", "原理"],
+      "priority_boost": 1.0
+    }
+  },
+
+  "topic_types": {
+    "_description": "选题类型定义（可多选）",
+    "types": {
+      "工具型": {
+        "keywords": ["神器", "工具", "插件", "扩展", "MCP"],
+        "weight": 1.5,
+        "avg_reads": 1650
+      },
+      "教程型": {
+        "keywords": ["手把手", "教你", "教程", "入门", "指南"],
+        "weight": 1.4,
+        "avg_reads": 1800
+      },
+      "热点型": {
+        "keywords": ["发布", "更新", "官宣", "首发"],
+        "weight": 1.6,
+        "avg_reads": 2000
+      },
+      "测评型": {
+        "keywords": ["测评", "对比", "实测", "体验"],
+        "weight": 1.2,
+        "avg_reads": 1400
+      },
+      "羊毛型": {
+        "keywords": ["免费", "白嫖", "薅羊毛", "省钱"],
+        "weight": 1.3,
+        "avg_reads": 1500
+      },
+      "痛点型": {
+        "keywords": ["解决", "报错", "问题", "修复", "避坑"],
+        "weight": 1.4,
+        "avg_reads": 1550
+      }
+    }
+  },
+
+  "priority_formula": {
+    "_description": "选题优先级计算公式",
+    "formula": "priority = (layer_score * timeliness_boost * type_weight * brand_tier) / risk_factor",
+    "layer_scores": {
+      "layer1": 100,
+      "layer2": 75,
+      "layer3": 40
+    },
+    "brand_tiers": {
+      "S": 1.5,
+      "A": 1.2,
+      "B": 1.0,
+      "none": 0.7
+    },
+    "risk_factors": {
+      "low": 1.0,
+      "medium": 1.3,
+      "high": 1.8
+    }
+  }
+}

@@ -11,13 +11,17 @@
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "@next/swc-win32-x64-msvc": "^15.5.7",
+    "@tailwindcss/typography": "^0.5.19",
     "axios": "^1.6.0",
     "lucide-react": "^0.460.0",
     "next": "^15.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-hot-toast": "^2.6.0",
-    "recharts": "^2.10.0"
+    "react-markdown": "^10.1.0",
+    "recharts": "^2.10.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { spawn } from 'child_process';
+import path from 'path';
 
 /**
  * 标题评分API
@@ -25,77 +27,98 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: 真实实现调用Python脚本
-    // const { exec } = require('child_process');
-    // const result = await exec(`python scripts/core/title_scorer.py "${title}"`);
+    const projectRoot = path.join(process.cwd(), '..', '..');
+    const scriptDir = path.join(projectRoot, '.claude', 'skills', 'gongzhonghao-writer', 'scripts', 'core');
+    const scriptPath = path.join(scriptDir, 'title_scorer.py');
 
-    // 临时模拟数据
-    const hasBrand = /Kimi|Claude|Cursor|Gemini|ChatGPT|Copilot/.test(title);
-    const hasAction = /试了|用了|装了|测了|发现/.test(title);
-    const hasEfficiency = /一键|半年|3秒|瞬间|快速/.test(title);
-    const hasProblem = /怎么|为什么|原来|竟然|没想到/.test(title);
-    const hasNumber = /\d+|一个|两个|三个|多个/.test(title);
-    const hasVersion = /v\d+\.\d+|\d+\.\d+/.test(title);
-    const titleLength = title.length;
+    // 执行Python标题评分脚本
+    const result = await new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+      const pythonProcess = spawn('python', [scriptPath, title], {
+        cwd: scriptDir,
+        timeout: 15000,
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
+      });
 
-    const scores = {
-      brand: hasBrand ? 20 : 0,
-      action: hasAction ? 15 : 0,
-      efficiency: hasEfficiency ? 15 : 0,
-      problem: hasProblem ? 15 : 0,
-      number: hasNumber ? 10 : 0,
-      version: hasVersion ? 10 : 0,
-      length: titleLength >= 18 && titleLength <= 30 ? 15 : titleLength >= 15 && titleLength <= 35 ? 10 : 5
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve({ stdout, stderr });
+        } else {
+          reject(new Error(`标题评分失败，退出码: ${code}\n${stderr}`));
+        }
+      });
+
+      pythonProcess.on('error', (error) => {
+        reject(error);
+      });
+    });
+
+    // 解析Python脚本输出
+    const output = result.stdout;
+    const scores: any = {};
+
+    // 解析各维度分数
+    const dimensionPatterns = {
+      brand: /【品牌词】:\s*([\d.]+)分/,
+      action: /【动作词】:\s*([\d.]+)分/,
+      efficiency: /【效率词】:\s*([\d.]+)分/,
+      problem: /【问题解决】:\s*([\d.]+)分/,
+      number: /【数字】:\s*([\d.]+)分/,
+      version: /【版本号】:\s*([\d.]+)分/,
+      length: /【标题长度】:\s*([\d.]+)分/
     };
 
-    const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-    const maxScore = 100;
+    for (const [key, pattern] of Object.entries(dimensionPatterns)) {
+      const match = output.match(pattern);
+      if (match) {
+        scores[key] = parseFloat(match[1]);
+      }
+    }
 
-    const level = totalScore >= 80 ? '🏆 爆款潜力' :
-                  totalScore >= 60 ? '⭐ 优秀' :
-                  totalScore >= 40 ? '✅ 合格' :
-                  '⚠️ 需优化';
+    // 解析总分
+    const totalMatch = output.match(/【总分】:\s*([\d.]+)分/);
+    const totalScore = totalMatch ? parseFloat(totalMatch[1]) : 0;
 
-    const suggestions = [];
-    if (!hasBrand) suggestions.push('建议加入核心工具品牌词（如Claude/Cursor/Kimi）');
-    if (!hasAction) suggestions.push('建议加入动作词（如"试了"/"用了"）增加真实感');
-    if (!hasEfficiency) suggestions.push('建议加入效率词（如"一键"/"3秒"）强化卖点');
-    if (!hasProblem) suggestions.push('建议加入问题解决词（如"怎么"/"原来"）激发好奇');
-    if (!hasNumber) suggestions.push('建议加入数字（如"3个技巧"）提升具体性');
-    if (titleLength < 18) suggestions.push('标题太短，建议扩展到18-30字');
-    if (titleLength > 30) suggestions.push('标题太长，建议精简到18-30字');
+    // 解析爆款潜力
+    const potentialMatch = output.match(/【爆款潜力】:\s*(.+)/);
+    const boomPotential = potentialMatch ? potentialMatch[1].trim() : '未知';
 
-    const result = {
-      title,
-      totalScore,
-      maxScore,
-      level,
-      scores: {
-        brand: { score: scores.brand, max: 20, passed: hasBrand },
-        action: { score: scores.action, max: 15, passed: hasAction },
-        efficiency: { score: scores.efficiency, max: 15, passed: hasEfficiency },
-        problem: { score: scores.problem, max: 15, passed: hasProblem },
-        number: { score: scores.number, max: 10, passed: hasNumber },
-        version: { score: scores.version, max: 10, passed: hasVersion },
-        length: { score: scores.length, max: 15, current: titleLength, optimal: '18-30字' }
-      },
-      suggestions,
-      formula: hasBrand && hasAction ? '工具推荐型 (5.25x)' :
-               hasProblem ? '痛点解决型 (1.65x)' :
-               hasEfficiency ? '效率承诺型 (1.68x)' :
-               hasBrand ? '品牌词型 (1.59x)' :
-               '通用型'
-    };
+    // 解析建议
+    const suggestions: string[] = [];
+    const suggestionMatches = output.matchAll(/💡\s*(.+)/g);
+    for (const match of suggestionMatches) {
+      suggestions.push(match[1].trim());
+    }
 
     return NextResponse.json({
       success: true,
-      data: result
+      message: '标题评分完成',
+      data: {
+        title,
+        scores,
+        totalScore,
+        boomPotential,
+        suggestions,
+        timestamp: new Date().toISOString()
+      }
     });
+
   } catch (error: any) {
-    console.error('标题评分失败:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || '服务器错误' },
-      { status: 500 }
-    );
+    console.error('标题评分API错误:', error);
+    return NextResponse.json({
+      success: false,
+      error: error.message || '标题评分失败',
+      details: error.stack
+    }, { status: 500 });
   }
 }

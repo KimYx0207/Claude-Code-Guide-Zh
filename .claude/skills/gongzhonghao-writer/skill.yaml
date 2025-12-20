@@ -1,61 +1,21 @@
 ---
-name: "公众号写作助手 V7.1.0"
-description: "基于数据驱动的AI公众号写作系统。数据验证公式、7维度标题评分、8维度发文前检查、9维度质量检测、数据同步规范"
-version: "7.1.0"
-data_version: "rule_validation_report.json V7.1 (2025-12-09)"
-debug:
-  enabled: true
-  load_priority: "project"
-  override_global: true
-  info: "V7.1.0版本已激活 - 数据验证规则更新、数据驱动工作流规范"
+name: "公众号写作助手"
+version: "9.0.0"
+description: "基于82篇数据验证的三层架构爆款系统。配置驱动、优先级公式、Layer1/2/3选题过滤"
 
-# V7.1.0 Changelog
-changelog:
-  - version: "7.1.0"
-    date: "2025-12-09"
-    changes:
-      - "数据验证规则更新：删除FOMO公式（82篇零命中）、情绪词（0.32x负相关）"
-      - "新增工具推荐公式（5.25x最强）：用了X才知道+神器"
-      - "标题长度逻辑反转：长标题（>25字）效果更好"
-      - "新增DATA_DRIVEN_WORKFLOW.md数据驱动规范"
-      - "42-data-analyze新增数据同步提醒机制"
-      - "CLAUDE.md新增第10章数据驱动规范"
-      - "所有文件添加data_version版本标注"
-  - version: "7.0.0"
-    date: "2025-12-08"
-    changes:
-      - "命令系统重构：全部重命名为数字前缀（01-write, 11-hotspot等）"
-      - "新增4个数据驱动工具：title_generator, title_scorer, pre_publish_checker, topic_filter"
-      - "新增4个Slash命令：/title-gen, /title-score, /pre-check, /topic-filter"
-      - "爆款规律升级V7.0：5大公式+3必要条件（基于真实数据分析）"
-      - "新增/help帮助命令：完整命令列表和工作流指南"
-      - "CLAUDE.md全面更新：命令速查表+推荐工作流"
-      - "用户体验优化：命令分组、交叉引用、工作流指南"
-  - version: "6.2.0"
-    date: "2025-12-05"
-    changes:
-      - "项目结构优化：删除冗余data目录"
-      - "清理垃圾文件：nul、debug/test脚本、__pycache__"
-      - "hooks清理：删除无用.sh文件，保留Windows .bat"
-      - "prompts合并：删除重复prompts，统一到baokuan-rules.md"
-  - version: "6.1.2"
-    date: "2025-11-29"
-    changes:
-      - "新增热点扫描、一键爆款、每日扫描功能"
-      - "新增automation.yaml配置文件"
-  - version: "6.0.0"
-    date: "2025-11-26"
-    changes:
-      - "V6六层架构：Command→Skill→Orchestrator→Service→Adapter→Core"
+# 核心配置
+config:
+  data_source: "config/*.json"
+  architecture: "三层架构"
+  priority_formula: "layer_score × timeliness × type_weight × brand_tier ÷ risk"
 
-# 触发关键词 - V7.0统一版
+# 触发关键词
 triggers:
   keywords:
-    # 核心命令
     - "/write"
     - "/write-auto"
     - "/write-rewrite"
-    - "/hotspot"
+    - "/scan"
     - "/daily"
     - "/title-gen"
     - "/title-score"
@@ -63,226 +23,117 @@ triggers:
     - "/topic-filter"
     - "/image"
     - "/infographic"
-    - "/data-collect"
-    - "/data-analyze"
+    - "/collect"
+    - "/analyze"
     - "/help"
-    # 通用关键词
     - "公众号"
     - "写文章"
     - "老金风格"
     - "热点扫描"
     - "爆款"
     - "标题"
-    - "AI编程"
-    - "Claude Code"
-    - "Cursor"
-    - "人味儿"
-    - "自然表达"
-    - "配图"
-    - "信息图"
 
-# V7.0命令系统（按功能分组编号）
+# 命令系统
 commands:
-  # 帮助类 (00)
-  - name: "help"
-    code: "00-help"
-    description: "🆘 帮助中心 - 查看所有命令和工作流"
+  help:
+    code: "02-help"
+    description: "帮助中心"
 
-  # 写作类 (01-03)
-  - name: "write"
-    code: "01-write"
-    description: "✍️ 完整写作流程（8步）"
-    workflow: "爆款规律 → Research → 写作 → 标题 → 保存 → 质量检测 → 发文前检查"
+  write:
+    code: "03-write"
+    description: "完整写作流程"
 
-  - name: "write-auto"
-    code: "02-write-auto"
-    description: "🚀 全自动爆款生成"
-    workflow: "热点 → 类型检测 → 模板 → 写作 → 标题 → 质量 → 保存"
+  write_auto:
+    code: "04-write-auto"
+    description: "全自动爆款生成"
 
-  - name: "write-rewrite"
-    code: "03-write-rewrite"
-    description: "🔄 文章翻新改写"
+  write_rewrite:
+    code: "05-write-rewrite"
+    description: "文章翻新改写"
 
-  # 热点类 (11-12)
-  - name: "hotspot"
-    code: "11-hotspot"
-    description: "🔥 AI热点扫描+爆款评估"
-    workflow: "扫描GitHub/HN/新闻 → 5维度评估 → 推荐"
-
-  - name: "daily"
-    code: "12-daily"
-    description: "📅 每日热点扫描+自动写作"
-    workflow: "热点扫描 → 过滤 → 批量生成 → 报告"
-
-  # 标题类 (21-24)
-  - name: "title-gen"
+  title_gen:
     code: "21-title-gen"
-    description: "📝 生成5个爆款标题"
-    script: "scripts/title_generator.py"
+    description: "生成爆款标题"
+    script: "scripts/core/title_generator.py"
 
-  - name: "title-score"
+  title_score:
     code: "22-title-score"
-    description: "📊 7维度标题评分"
-    script: "scripts/title_scorer.py"
+    description: "标题评分"
+    script: "scripts/core/title_scorer.py"
 
-  - name: "pre-check"
+  pre_check:
     code: "23-pre-check"
-    description: "✅ 发文前8维度检查"
-    script: "scripts/pre_publish_checker.py"
+    description: "发文前检查"
+    script: "scripts/core/pre_publish_checker.py"
 
-  - name: "topic-filter"
+  topic_filter:
     code: "24-topic-filter"
-    description: "🎯 选题可行性过滤"
-    script: "scripts/topic_filter.py"
+    description: "三层架构选题过滤"
+    script: "scripts/core/topic_filter.py"
 
-  # 图片类 (31-32)
-  - name: "image"
+  scan:
+    code: "51-scan"
+    description: "三层架构热点扫描"
+
+  daily:
+    code: "52-daily"
+    description: "每日热点+自动写作"
+
+  image:
     code: "31-image"
-    description: "🖼️ 自动添加配图"
+    description: "自动添加配图"
 
-  - name: "infographic"
+  infographic:
     code: "32-infographic"
-    description: "📈 生成信息图"
+    description: "生成信息图"
     script: "scripts/infographic_generator.py"
 
-  # 数据类 (41-42)
-  - name: "data-collect"
-    code: "41-data-collect"
-    description: "📥 收集微信公众号数据"
+  collect:
+    code: "41-collect"
+    description: "收集微信公众号数据"
 
-  - name: "data-analyze"
-    code: "42-data-analyze"
-    description: "📊 深度分析文章数据"
+  analyze:
+    code: "42-analyze"
+    description: "深度分析文章数据"
 
-# 核心能力（V7.0数据驱动）
-capabilities:
-  - name: "数据驱动的爆款公式"
-    description: "基于真实数据分析的5大公式+3必要条件"
-    source: "prompts/baokuan-rules.md"
-
-  - name: "7维度标题评分"
-    description: "品牌词(35)+动作词(15)+效率词(10)+情绪词(15)+问题解决(10)+数字/版本(10)+长度(5)"
-    script: "scripts/title_scorer.py"
-
-  - name: "8维度发文前检查"
-    description: "必须通过：品牌词+动作词+总分≥60"
-    script: "scripts/pre_publish_checker.py"
-
-  - name: "9维度质量检测"
-    description: "AI腔、自然度、真诚度、啰嗦度、重复度、可读性、人味儿指数、情感真实性、脏话检测"
-    script: "scripts/quality_detector.py"
-
-  - name: "选题过滤器"
-    description: "S/A/B级工具分类 + 高/低需求关键词"
-    script: "scripts/topic_filter.py"
-
-# 工具脚本清单
+# 核心脚本
 scripts:
-  - name: "quality_detector.py"
-    description: "9维度质量检测"
-  - name: "title_generator.py"
-    description: "5公式标题生成器"
-  - name: "title_scorer.py"
-    description: "7维度标题评分"
-  - name: "pre_publish_checker.py"
-    description: "8维度发文前检查"
-  - name: "topic_filter.py"
-    description: "选题可行性过滤"
-  - name: "infographic_generator.py"
-    description: "信息图生成"
+  core:
+    - "scripts/core/title_generator.py"
+    - "scripts/core/title_scorer.py"
+    - "scripts/core/pre_publish_checker.py"
+    - "scripts/core/topic_filter.py"
+    - "scripts/core/ecosystem_filter.py"
+    - "scripts/core/quality_detector.py"
+  utils:
+    - "scripts/infographic_generator.py"
+    - "scripts/analyze_wechat_data.py"
 
-# MCP服务依赖
-dependencies:
-  mcp_servers:
-    - name: "WebSearch"
-      description: "内置搜索（优先使用）"
-      required: true
+# 配置文件
+config_files:
+  - "config/core_tools_pool.json"
+  - "config/brands_config.json"
+  - "config/formulas_config.json"
+  - "config/quality_config.json"
 
-    - name: "exa"
-      description: "深度搜索引擎"
-      required: false
-
-    - name: "context7"
-      description: "技术文档查询"
-      required: false
-
-    - name: "playwright"
-      description: "信息图截图"
-      required: false
-
-# 老金个人背景
-author_profile:
-  identity: "普通人视角的科技博主"
-  coding_ability: "不会代码"
-  english_level: "英语没过四级"
-  personality: "接地气，用大白话讲技术"
-  writing_style: "自然表达，像和朋友聊天"
-
-# 核心提示词文件
-prompt_files:
-  style: "prompts/laojin-style-v6-natural.md"
-  baokuan: "prompts/baokuan-rules.md"
-  image: "prompts/auto-image-generator.md"
-  infographic: "prompts/infographic-generator.md"
-
-# V7.1数据依赖声明（重要！）
-data_dependencies:
-  source: "data/rule_validation_report.json"
-  version: "V7.1"
-  generated_at: "2025-12-09"
-  dependent_files:
-    p0_critical:
-      - path: "prompts/baokuan-rules.md"
-        description: "爆款公式和评分权重定义"
-      - path: "scripts/title_scorer.py"
-        description: "标题评分逻辑实现"
-      - path: "scripts/title_generator.py"
-        description: "标题生成逻辑实现"
-      - path: "commands/01-write.md"
-        description: "写作命令公式推荐"
-      - path: "commands/02-write-auto.md"
-        description: "自动写作流程"
-    p1_important:
-      - path: "scripts/quality_detector.py"
-        description: "质量检测规则"
-      - path: "scripts/topic_filter.py"
-        description: "选题过滤规则"
-      - path: "commands/21-title-gen.md"
-        description: "标题生成命令"
-      - path: "commands/22-title-score.md"
-        description: "标题评分命令"
-  workflow_doc: "DATA_DRIVEN_WORKFLOW.md"
-  sync_check_script: "scripts/check_data_sync.py"
-
-# V7.1质量标准（数据验证版）
+# 质量标准
 quality_standards:
-  title_scoring:
-    - "品牌词(35分)：Claude/Cursor/Gemini等 [1.59x]"
-    - "动作词(15分)：手把手/教你/教程等 [1.95x]"
-    - "效率词(10分)：一键/秒/分钟等 [1.68x]"
-    - "工具推荐公式(20分)：用了X才知道+神器 [5.25x最强！]"
-    - "问题解决(10分)：？/怎么/搞定等 [1.65x]"
-    - "数字/版本(10分)：3.5/90%/10倍等"
-    - "长度(5分)：>30字效果更好（V7.1数据验证）"
-    - "⚠️ 已删除：情绪词（0.32x负相关）"
+  ai_score: "< 20"
+  natural_score: "> 80"
+  sincere_score: "> 75"
+  title_min_score: 60
 
-  pre_publish_check:
-    - "品牌词存在（必须）"
-    - "动作词存在（必须）"
-    - "总分≥60分（必须）"
-    - "效率词存在（加分）"
-    - "情绪词存在（加分）"
-    - "数字/版本存在（加分）"
-    - "问题解决存在（加分）"
-    - "长度适中（加分）"
-
-  humanity_metrics:
-    - "AI腔检测 < 20分"
-    - "自然度 > 80分"
-    - "真诚度 > 75分"
-    - "啰嗦度 < 25分"
-    - "重复度 < 15%"
-    - "可读性 > 85分"
-    - "人味儿指数 > 70分"
-    - "情感真实性 > 75分"
-    - "脏话检测 = 0处"
+# 三层架构数据基准
+layer_benchmarks:
+  layer1:
+    name: "核心工具官方"
+    avg_reads: 2200
+    boom_rate: "71%"
+  layer2:
+    name: "核心工具生态"
+    avg_reads: 1450
+    boom_rate: "24%"
+  layer3:
+    name: "泛AI话题"
+    avg_reads: 908
+    boom_rate: "5%"

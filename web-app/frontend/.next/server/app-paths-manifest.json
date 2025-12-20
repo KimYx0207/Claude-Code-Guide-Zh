@@ -1,3 +1,6 @@
 {
+  "/api/data/stats/route": "app/api/data/stats/route.js",
+  "/api/docs/list/route": "app/api/docs/list/route.js",
+  "/api/articles/list/route": "app/api/articles/list/route.js",
   "/page": "app/page.js"
 }

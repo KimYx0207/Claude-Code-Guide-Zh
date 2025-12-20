@@ -1,30 +1,55 @@
 # -*- coding: utf-8 -*-
 """
-爆款标题生成器 V7.2 - 模块化重构版
-基于82篇文章数据验证，支持完整输出格式（标题+评分+爆款指数+推荐理由）
-
-V7.2更新（2025-12-10）：
-- 新增 generate_with_reasons() 方法，返回完整的推荐理由
-- 新增 爆款指数（1-5星）计算
-- 新增 generate_full_report() 统一输出格式
-- 供所有写作命令（/write, /write-auto, /write-rewrite）统一调用
-
-V7.1 公式有效性排序（按effectiveness）：
-1. 工具推荐公式: 5.25x（用了X时间才知道+神器）
-2. 教程词公式: 1.95x（手把手教你）
-3. 效率承诺公式: 1.68x（一键/秒）
-4. 痛点解决公式: 1.65x（XX了？手把手教你）
-5. 品牌词公式: 1.59x（Claude/Cursor/Gemini）
-
-⚠️ 已删除的无效公式：
-- FOMO型（99%不知道）: 0.00x 零命中
-- 情绪词公式: 0.32x 负相关
+爆款标题生成器 V9.0 - 配置驱动版
+从formulas_config.json动态读取爆款规律
 """
 
 import re
+import sys
 import random
 from typing import List, Dict, Optional
 from dataclasses import dataclass
+from pathlib import Path
+
+# 添加config目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from config.loader import load_config as _load_config
+
+
+def load_config():
+    """从配置中心加载爆款规律（动态读取，不硬编码）"""
+    try:
+        return _load_config('formulas_config')
+    except FileNotFoundError:
+        print(f"⚠️ 配置文件不存在，使用默认配置")
+        return get_default_config()
+    except Exception as e:
+        print(f"⚠️ 配置加载失败：{e}，使用默认配置")
+        return get_default_config()
+
+
+def get_default_config():
+    """默认配置（兜底方案）"""
+    return {
+        "formulas": {
+            "top_formulas": [
+                {"name": "品牌+白嫖", "rank": 1, "templates": ["[品牌]免费用，老金教你白嫖"]},
+                {"name": "老金+神器", "rank": 2, "templates": ["老金用[工具]才知道，少了这个神器"]},
+                {"name": "手把手+教程", "rank": 3, "templates": ["手把手教你[操作]"]}
+            ]
+        },
+        "keywords": {
+            "must_include": [
+                {"keyword": "品牌词", "examples": ["Claude", "Gemini", "Cursor"]},
+                {"keyword": "教程词", "examples": ["手把手", "教程"]},
+                {"keyword": "效果词", "examples": ["神器", "白嫖"]}
+            ]
+        }
+    }
+
+
+# 加载配置（全局变量，启动时加载一次）
+CONFIG = load_config()
 
 
 @dataclass
@@ -39,65 +64,80 @@ class TitleFormula:
 class TitleGenerator:
     """爆款标题生成器"""
 
-    # V7.1 爆款公式（按effectiveness排序，高效公式排前面）
-    # 重要：所有公式都应包含{brand}占位符以获得品牌词35分加成！
-    FORMULAS = [
-        # 1. 工具推荐型 - effectiveness=5.25x（最强！）
-        TitleFormula(
-            name="工具推荐型",
-            pattern="老金用{brand}{action}{time}才知道，原来一直少了{tool}",
-            example="老金用Claude写了半年代码才知道，原来一直少装了这个神器",
-            suitable_for=["工具推荐", "效率提升", "神器分享", "问题解决", "教程"]
-        ),
-        # 2. 痛点解决型 - effectiveness=1.65x
-        TitleFormula(
-            name="痛点解决型",
-            pattern="{brand}开始{problem}了？手把手教你{solution}",
-            example="Gemini Pro开始二次校验了？手把手教你怎么过",
-            suitable_for=["问题解决", "教程", "踩坑"]
-        ),
-        # 3. 效率承诺型 - effectiveness=1.68x
-        TitleFormula(
-            name="效率承诺型",
-            pattern="{brand}{speed}{action}，{effect}",
-            example="Gemini Cli一键安装及好用的使用策略",
-            suitable_for=["快速上手", "效率工具", "简化流程"]
-        ),
-        # 4. 版本解读型 - effectiveness=0.94x（效果一般，保留但降权）
-        TitleFormula(
-            name="版本解读型",
-            pattern="{brand} {version}：老金{action}，{highlight}",
-            example="Cursor 0.50 老金实测报告，亮点和避坑都在了！",
-            suitable_for=["版本更新", "新功能", "实测评测"]
-        ),
-        # 5. 系列IP型 - 品牌特色，保留（V7.1: 必须包含品牌词）
-        TitleFormula(
-            name="系列IP型",
-            pattern="老金·邪修法则：{brand}{method}，{benefit}",
-            example="老金·邪修法则：Claude每天自动获取25$额度",
-            suitable_for=["羊毛", "省钱", "技巧"]
-        ),
-        # V7.1删除：FOMO型（effectiveness=0.00x，82篇零命中）
-    ]
+    # V8.0：从配置加载，不再硬编码
+    def __init__(self):
+        """初始化：从配置加载爆款公式"""
+        self.config = CONFIG
+        self.formulas = self._load_formulas_from_config()
+        self.brand_words = self._load_brand_words_from_config()
 
-    # 品牌词库（爆款占比83%）
-    # V7.1更新：国内头部产品同样是S级
-    BRAND_WORDS = [
-        # S级：国际头部
-        "Claude", "Cursor", "Gemini", "GPT", "ChatGPT", "Google", "OpenAI", "Anthropic",
-        # S级：国内头部（月活过亿/垂直天花板）
-        "DeepSeek", "豆包", "通义", "千问", "Kimi", "智谱",
-        # S级：视频生成天花板
-        "可灵", "即梦", "海螺", "MiniMax", "Suno", "Midjourney", "Runway",
-        # A级：国际知名
-        "Copilot", "Windsurf", "Bolt", "v0", "Perplexity", "Lovart", "Pika", "Luma",
-        # A级：国内知名
-        "文心", "百度", "腾讯混元", "讯飞", "Vidu", "PixVerse", "清影",
-        # B级
-        "Ollama", "LLaMA", "Mistral", "Stable Diffusion"
-    ]
+    def _load_formulas_from_config(self) -> List[TitleFormula]:
+        """从配置加载公式模板"""
+        formulas = []
 
-    # 动作词库（爆款+19%）
+        for formula_data in self.config.get('formulas', {}).get('top_formulas', []):
+            name = formula_data.get('name', '')
+            templates = formula_data.get('templates', [])
+
+            if templates:
+                formulas.append(TitleFormula(
+                    name=name,
+                    pattern=templates[0],  # 使用第一个模板
+                    example=formula_data.get('examples', [templates[0]])[0] if formula_data.get('examples') else templates[0],
+                    suitable_for=["通用"]  # 简化处理
+                ))
+
+        return formulas if formulas else self._get_default_formulas()
+
+    def _get_default_formulas(self) -> List[TitleFormula]:
+        """默认公式（兜底）"""
+        return [
+            TitleFormula(
+                name="老金+神器",
+                pattern="老金用{brand}才知道，原来一直少了这个神器",
+                example="老金用Claude写代码才知道，原来一直少装了这个神器",
+                suitable_for=["工具推荐"]
+            ),
+            TitleFormula(
+                name="手把手+教程",
+                pattern="手把手教你用{brand}，{effect}",
+                example="手把手教你用Claude Code，10分钟搞定AI编程",
+                suitable_for=["教程"]
+            )
+        ]
+
+    def _load_brand_words_from_config(self) -> List[str]:
+        """从配置加载品牌词"""
+        keywords = self.config.get('keywords', {}).get('must_include', [])
+
+        brands = []
+        for kw in keywords:
+            if kw.get('keyword') == '品牌词':
+                brands = kw.get('examples', [])
+                break
+
+        # 扩展品牌词库（保留常用的）
+        if not brands:
+            brands = ["Claude", "Cursor", "Gemini", "GPT"]
+
+        # 补充完整品牌词库
+        extended_brands = brands + [
+            "ChatGPT", "Google", "OpenAI", "Anthropic",
+            "DeepSeek", "Kimi", "Coze", "MiniMax",
+            "Copilot", "Windsurf", "v0", "Bolt"
+        ]
+
+        return list(set(extended_brands))  # 去重
+
+    # 品牌词库（V8.0：从配置动态加载）
+    @property
+    def BRAND_WORDS(self):
+        return self.brand_words
+
+    # 公式列表（V8.0：从配置动态加载）
+    @property
+    def FORMULAS(self):
+        return self.formulas
     ACTION_WORDS = ["手把手", "教你", "教程", "攻略", "指南", "实战"]
 
     # 效率词库（爆款+11%）
@@ -108,9 +148,6 @@ class TitleGenerator:
     TOOL_WORDS = ["神器", "工具", "利器", "插件", "扩展"]  # 工具词有效
     # 以下情绪词仅保留用于检测，不作为推荐
     EMOTION_WORDS_DEPRECATED = ["绝了", "真香", "爆", "牛逼", "炸裂", "惊了", "麻了"]
-
-    def __init__(self):
-        pass
 
     def generate(
         self,

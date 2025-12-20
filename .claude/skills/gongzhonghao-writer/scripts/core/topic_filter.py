@@ -1,204 +1,158 @@
 # -*- coding: utf-8 -*-
 """
-选题过滤器 V3.0 - 双轨制简化版
-基于82篇历史文章数据驱动设计
-
-V3.0 核心逻辑：
-1. 核心工具类：大厂 + AI垂直厂商的工具 → 稳定流量，常写
-2. 泛AI话题类：AI现象/趋势/热点 → 破圈潜力，精选写
-
-数据验证结论：
-- 核心工具类：54篇，平均阅读 1798
-- 泛AI话题类：25篇，平均阅读 908
-- 核心工具类平均阅读是泛AI话题类的2倍
-
-设计理念：
-- 不评分，只分类
-- 核心工具池用数据验证
-- 时效性决定写作策略（快写 vs 慢写）
+选题过滤器 V9.0 - 三层架构版
+优先级公式：priority = layer_score × timeliness × type_weight × brand_tier ÷ risk
 """
 
+import sys
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 from dataclasses import dataclass, field
 from datetime import datetime
 
+# 添加config目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from config.loader import load_config
+
 
 @dataclass
-class FilterResultV3:
-    """V3过滤结果"""
-    category: str  # "核心工具类" / "泛AI话题类" / "不建议"
+class TopicType:
+    """选题类型"""
+    name: str
+    weight: float
+    keywords: List[str]
+
+
+@dataclass
+class FilterResultV8:
+    """V8过滤结果 - 三层架构版"""
+    # 基础信息
+    layer: str  # "layer1" / "layer2" / "layer3" / "rejected"
     worth_writing: bool
-    tool_matched: Optional[str]  # 匹配到的工具/品牌
-    timeliness: str  # "热点期" / "常青期"
-    strategy: str  # 写作策略建议
+    priority_score: float  # 优先级分数
+
+    # 工具/品牌信息
+    tool_matched: Optional[str]
+    tool_tier: Optional[str]  # S/A/B
+    avg_reads_estimate: int
+
+    # 分类信息（可多选）
+    topic_types: List[str]  # ["热点型", "教程型"] 等
+    timeliness: str  # "紧急热点" / "近期更新" / "常青内容"
+    risk_level: str  # "low" / "medium" / "high"
+
+    # 策略建议
+    strategy: str
+    deadline_hint: str  # "24小时内" / "72小时内" / "可打磨"
+
+    # 分析明细
     insights: List[str]
-    historical_avg_reads: Optional[int]  # 该工具/品牌的历史平均阅读
+    score_breakdown: Dict[str, float]  # 分数拆解
 
 
-class TopicFilterV3:
-    """选题过滤器 V7.1 - 双轨制"""
+class TopicFilterV8:
+    """选题过滤器 V8.0 - 三层架构+多类型+优先级公式"""
 
-    # 核心工具池（数据验证通过，按平均阅读排序）
-    # 来源：82篇文章数据分析
-    CORE_TOOLS = {
-        # === 大厂出品 ===
-        "Google/Gemini": {
-            "keywords": ["gemini", "google", "谷歌", "g3", "bard"],
-            "avg_reads": 3146,
-            "tier": "大厂",
-        },
-        "ByteDance/即梦": {
-            "keywords": ["即梦", "豆包", "字节", "jimeng", "doubao"],
-            "avg_reads": 2927,
-            "tier": "大厂",
-        },
-        "Anthropic/Claude": {
-            "keywords": ["claude", "anthropic"],
-            "avg_reads": 2118,
-            "tier": "大厂",
-        },
-        "OpenAI/ChatGPT": {
-            "keywords": ["chatgpt", "gpt", "openai", "gpt-4", "gpt-5", "gpt5", "gpt4"],
-            "avg_reads": 675,  # 低于预期，但仍是大厂
-            "tier": "大厂",
-        },
-        "DeepSeek": {
-            "keywords": ["deepseek", "深度求索"],
-            "avg_reads": 1048,
-            "tier": "大厂",
-        },
-        "Kimi/月之暗面": {
-            "keywords": ["kimi", "月之暗面", "moonshot"],
-            "avg_reads": 3448,
-            "tier": "大厂",
-        },
-        "百度/文心": {
-            "keywords": ["文心", "百度", "ernie", "wenxin"],
-            "avg_reads": None,  # 无数据
-            "tier": "大厂",
-        },
-        "阿里/通义": {
-            "keywords": ["通义", "阿里", "qwen", "tongyi"],
-            "avg_reads": None,
-            "tier": "大厂",
-        },
-        "Microsoft/Copilot": {
-            "keywords": ["copilot", "microsoft", "微软", "bing"],
-            "avg_reads": None,
-            "tier": "大厂",
-        },
-        "Meta/Llama": {
-            "keywords": ["llama", "meta ai", "facebook ai"],
-            "avg_reads": None,
-            "tier": "大厂",
-        },
+    def __init__(self):
+        """初始化：从配置加载"""
+        # 加载配置
+        self.tools_config = load_config('core_tools_pool')
+        self.quality_config = load_config('quality_config')
+        self.brands_config = load_config('brands_config')
 
-        # === AI垂直厂商 ===
-        "Cursor": {
-            "keywords": ["cursor"],
-            "avg_reads": 1246,
-            "tier": "AI垂直",
-        },
-        "Codex": {
-            "keywords": ["codex"],
-            "avg_reads": 1199,
-            "tier": "AI垂直",
-        },
-        "Coze": {
-            "keywords": ["coze", "扣子"],
-            "avg_reads": 689,
-            "tier": "AI垂直",
-        },
-        "Midjourney": {
-            "keywords": ["midjourney", "mj", "niji"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Runway": {
-            "keywords": ["runway"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Perplexity": {
-            "keywords": ["perplexity"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Suno": {
-            "keywords": ["suno"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "可灵": {
-            "keywords": ["可灵", "kling"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Windsurf": {
-            "keywords": ["windsurf", "codeium"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Bolt": {
-            "keywords": ["bolt.new", "bolt"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "v0": {
-            "keywords": ["v0.dev", "v0"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
-        "Replit": {
-            "keywords": ["replit"],
-            "avg_reads": None,
-            "tier": "AI垂直",
-        },
+        # 解析配置
+        self._load_layer1_tools()
+        self._load_layer2_ecosystem()
+        self._load_topic_types()
+        self._load_timeliness_rules()
+        self._load_priority_formula()
 
-        # === Claude Code 生态 ===
-        "Claude Code": {
-            "keywords": ["claude code", "cc", "claude-code"],
-            "avg_reads": 2118,  # 继承Claude的数据
-            "tier": "CC生态",
-        },
-        "MCP": {
-            "keywords": ["mcp", "model context protocol"],
-            "avg_reads": 1500,  # 估算
-            "tier": "CC生态",
-        },
-        "Skills": {
-            "keywords": ["skills", "skill", "技能"],
-            "avg_reads": 2000,  # 估算
-            "tier": "CC生态",
-        },
-        "Hooks": {
-            "keywords": ["hooks", "hook"],
-            "avg_reads": 1670,  # 实际数据
-            "tier": "CC生态",
-        },
-    }
+    def _load_layer1_tools(self):
+        """加载Layer1核心工具"""
+        layer1 = self.tools_config.get('layer1_official', {}).get('tools', {})
+        self.layer1_tools = {}
+        for name, info in layer1.items():
+            self.layer1_tools[name] = {
+                'keywords': [k.lower() for k in info.get('keywords', [name.lower()])],
+                'tier': info.get('tier', 'B'),
+                'avg_reads': info.get('avg_reads', 1000)
+            }
 
-    # 热点期信号词
-    HOTSPOT_SIGNALS = [
-        # 时间类
-        "发布", "上线", "更新", "推出", "刚刚", "今天", "昨晚", "今早",
-        "最新", "新版", "新功能", "官宣", "重磅", "突发", "紧急",
-        # 事件类
-        "被封", "限制", "涨价", "降价", "免费", "开放",
-        # 重大新闻类
-        "估值", "融资", "收购", "上市", "警报", "慌了", "炸了", "疯了",
-        "宣布", "确认", "曝光", "泄露", "首发", "独家",
-        # 产品动态类
-        "放大招", "大更新", "全新", "革命", "颠覆", "登顶", "第一",
-    ]
+    def _load_layer2_ecosystem(self):
+        """加载Layer2生态关键词"""
+        layer2 = self.tools_config.get('layer2_ecosystem', {})
+        self.ecosystem_keywords = []
+        rules = layer2.get('github_filter_rules', {})
+        self.ecosystem_keywords = [k.lower() for k in rules.get('must_contain_any', [])]
 
+        self.ecosystem_categories = layer2.get('categories', {})
 
-    def __init__(self, articles_dir: str = "articles"):
-        self.articles_dir = Path(articles_dir)
+    def _load_topic_types(self):
+        """加载选题类型"""
+        types_config = self.tools_config.get('topic_types', {}).get('types', {})
+        self.topic_types = {}
+        for name, info in types_config.items():
+            self.topic_types[name] = TopicType(
+                name=name,
+                weight=info.get('weight', 1.0),
+                keywords=[k.lower() for k in info.get('keywords', [])]
+            )
 
-    def filter(self, topic: str, context: Optional[str] = None) -> FilterResultV3:
+        # 默认类型（如果配置为空）
+        if not self.topic_types:
+            self.topic_types = {
+                "热点型": TopicType("热点型", 1.6, ["发布", "更新", "官宣", "首发"]),
+                "工具型": TopicType("工具型", 1.5, ["神器", "工具", "插件", "扩展", "mcp"]),
+                "教程型": TopicType("教程型", 1.4, ["手把手", "教你", "教程", "入门", "指南"]),
+                "羊毛型": TopicType("羊毛型", 1.3, ["免费", "白嫖", "薅羊毛", "省钱"]),
+                "痛点型": TopicType("痛点型", 1.4, ["解决", "报错", "问题", "修复", "避坑"]),
+                "测评型": TopicType("测评型", 1.2, ["测评", "对比", "实测", "体验"]),
+            }
+
+    def _load_timeliness_rules(self):
+        """加载时效性规则"""
+        rules = self.tools_config.get('timeliness_rules', {})
+        hot_signals = rules.get('hot_signals', {})
+
+        self.immediate_keywords = hot_signals.get('immediate', {}).get('keywords', [
+            "刚刚", "今天", "发布", "上线", "官宣", "breaking"
+        ])
+        self.immediate_boost = hot_signals.get('immediate', {}).get('priority_boost', 2.0)
+
+        self.recent_keywords = hot_signals.get('recent', {}).get('keywords', [
+            "最新", "更新", "新版", "升级"
+        ])
+        self.recent_boost = hot_signals.get('recent', {}).get('priority_boost', 1.5)
+
+        self.evergreen_keywords = rules.get('evergreen', {}).get('keywords', [
+            "教程", "入门", "指南", "详解", "原理"
+        ])
+
+    def _load_priority_formula(self):
+        """加载优先级公式参数"""
+        formula = self.tools_config.get('priority_formula', {})
+
+        self.layer_scores = formula.get('layer_scores', {
+            "layer1": 100,
+            "layer2": 75,
+            "layer3": 40
+        })
+
+        self.brand_tiers = formula.get('brand_tiers', {
+            "S": 1.5,
+            "A": 1.2,
+            "B": 1.0,
+            "none": 0.7
+        })
+
+        self.risk_factors = formula.get('risk_factors', {
+            "low": 1.0,
+            "medium": 1.3,
+            "high": 1.8
+        })
+
+    def filter(self, topic: str, context: Optional[str] = None) -> FilterResultV8:
         """
         过滤选题
 
@@ -207,173 +161,298 @@ class TopicFilterV3:
             context: 额外上下文
 
         Returns:
-            FilterResultV3: 过滤结果
+            FilterResultV8: 过滤结果
         """
         full_text = f"{topic} {context or ''}".lower()
         insights = []
+        score_breakdown = {}
 
-        # Step 1: 检查是否匹配核心工具池
-        matched_tool, tool_info = self._match_core_tool(full_text)
+        # Step 1: 判断Layer层级
+        layer, tool_matched, tool_info = self._determine_layer(full_text)
+        score_breakdown['layer_base'] = self.layer_scores.get(layer, 40)
 
-        if matched_tool:
-            # 核心工具类
-            timeliness = self._check_timeliness(full_text)
-            strategy = self._get_strategy("核心工具类", timeliness, tool_info)
+        # Step 2: 判断选题类型（可多选）
+        matched_types = self._match_topic_types(full_text)
+        type_weight = 1.0
+        for t in matched_types:
+            type_weight *= self.topic_types[t].weight
+        # 限制最大权重
+        type_weight = min(type_weight, 3.0)
+        score_breakdown['type_weight'] = type_weight
 
-            insights.append(f"✅ 匹配核心工具：{matched_tool}（{tool_info['tier']}）")
-            if tool_info.get("avg_reads"):
-                insights.append(f"📊 历史平均阅读：{tool_info['avg_reads']}")
-            insights.append(f"⏰ 时效性：{timeliness}")
+        # Step 3: 判断时效性
+        timeliness, timeliness_boost = self._check_timeliness(full_text)
+        score_breakdown['timeliness_boost'] = timeliness_boost
 
-            return FilterResultV3(
-                category="核心工具类",
-                worth_writing=True,
-                tool_matched=matched_tool,
-                timeliness=timeliness,
-                strategy=strategy,
-                insights=insights,
-                historical_avg_reads=tool_info.get("avg_reads"),
-            )
+        # Step 4: 判断品牌加成
+        brand_tier = tool_info.get('tier', 'none') if tool_info else 'none'
+        brand_boost = self.brand_tiers.get(brand_tier, 0.7)
+        score_breakdown['brand_boost'] = brand_boost
 
-        # Step 2: 检查是否是泛AI话题
-        is_ai_topic, ai_signals = self._check_ai_topic(full_text)
+        # Step 5: 判断风险系数
+        risk_level = self._assess_risk(layer, tool_matched)
+        risk_factor = self.risk_factors.get(risk_level, 1.0)
+        score_breakdown['risk_factor'] = risk_factor
 
-        if is_ai_topic:
-            timeliness = self._check_timeliness(full_text)
-            strategy = self._get_strategy("泛AI话题类", timeliness, None)
+        # Step 6: 计算优先级分数
+        priority_score = (
+            score_breakdown['layer_base'] *
+            score_breakdown['timeliness_boost'] *
+            score_breakdown['type_weight'] *
+            score_breakdown['brand_boost']
+        ) / score_breakdown['risk_factor']
+        priority_score = round(priority_score, 1)
 
-            insights.append(f"🌐 泛AI话题：{', '.join(ai_signals[:3])}")
-            insights.append(f"⏰ 时效性：{timeliness}")
-            insights.append("⚠️ 风险提示：泛AI话题平均阅读908，不爆就惨")
-            insights.append("💡 建议：选择有破圈潜力的角度，参考卡兹克的做法")
-
-            return FilterResultV3(
-                category="泛AI话题类",
-                worth_writing=True,
-                tool_matched=None,
-                timeliness=timeliness,
-                strategy=strategy,
-                insights=insights,
-                historical_avg_reads=908,  # 泛AI话题平均值
-            )
-
-        # Step 3: 不建议写
-        insights.append("❌ 未匹配核心工具池")
-        insights.append("❌ 未识别为泛AI话题")
-        insights.append("💡 建议：考虑关联一个核心工具，或找一个AI热点角度")
-
-        return FilterResultV3(
-            category="不建议",
-            worth_writing=False,
-            tool_matched=None,
-            timeliness="无",
-            strategy="不建议写，或需要重新定位角度",
-            insights=insights,
-            historical_avg_reads=None,
+        # Step 7: 生成分析
+        insights = self._generate_insights(
+            layer, tool_matched, tool_info, matched_types,
+            timeliness, risk_level, priority_score
         )
 
-    def _match_core_tool(self, text: str) -> tuple:
-        """匹配核心工具池"""
-        for tool_name, tool_info in self.CORE_TOOLS.items():
-            for keyword in tool_info["keywords"]:
-                # 使用单词边界匹配，避免误匹配
-                if keyword.lower() in text:
-                    return tool_name, tool_info
-        return None, None
+        # Step 8: 生成策略建议
+        strategy, deadline = self._generate_strategy(
+            layer, timeliness, priority_score, matched_types
+        )
 
-    def _check_timeliness(self, text: str) -> str:
-        """检查时效性"""
-        # 1. 检查热点信号词
-        for signal in self.HOTSPOT_SIGNALS:
-            if signal in text:
-                return "热点期"
+        # 预估阅读量
+        avg_reads = self._estimate_reads(layer, tool_info, priority_score)
 
-        # 2. 检查版本号（v5, 2.0, 3.1等 → 热点期）
-        if re.search(r'[vV]?\d+(\.\d+)?', text):
-            # 排除一些常见的非版本数字（如"100+"、"60倍"等）
-            version_match = re.search(r'[vV]\d+(\.\d+)?|\b\d+\.\d+\b', text)
-            if version_match:
-                return "热点期"
+        return FilterResultV8(
+            layer=layer,
+            worth_writing=priority_score >= 40,
+            priority_score=priority_score,
+            tool_matched=tool_matched,
+            tool_tier=brand_tier if brand_tier != 'none' else None,
+            avg_reads_estimate=avg_reads,
+            topic_types=matched_types,
+            timeliness=timeliness,
+            risk_level=risk_level,
+            strategy=strategy,
+            deadline_hint=deadline,
+            insights=insights,
+            score_breakdown=score_breakdown
+        )
 
-        return "常青期"
+    def _determine_layer(self, text: str) -> tuple:
+        """判断Layer层级"""
+        # 检查Layer1：核心工具官方
+        for tool_name, info in self.layer1_tools.items():
+            for kw in info['keywords']:
+                if kw in text:
+                    return "layer1", tool_name, info
 
-    def _check_ai_topic(self, text: str) -> tuple:
-        """检查是否是泛AI话题"""
-        ai_signals = []
+        # 检查Layer2：核心工具生态
+        for kw in self.ecosystem_keywords:
+            if kw in text:
+                # 找到关联的核心工具
+                for tool_name, info in self.layer1_tools.items():
+                    for tool_kw in info['keywords']:
+                        if tool_kw in text:
+                            return "layer2", tool_name, info
+                # 有生态关键词但未匹配具体工具
+                return "layer2", None, None
 
-        # AI相关通用词
-        ai_keywords = [
-            "ai", "人工智能", "机器学习", "深度学习", "大模型", "llm",
-            "生成式", "aigc", "智能体", "agent",
-            "替代", "失业", "未来", "变革", "颠覆",
-            "提示词", "prompt", "工作流", "自动化",
-        ]
-
+        # 检查Layer3：泛AI话题
+        ai_keywords = ["ai", "人工智能", "大模型", "llm", "agent", "智能体",
+                       "机器学习", "深度学习", "生成式", "aigc"]
         for kw in ai_keywords:
             if kw in text:
-                ai_signals.append(kw)
+                return "layer3", None, None
 
-        # 至少匹配2个AI相关词才算泛AI话题
-        return len(ai_signals) >= 1, ai_signals
+        # 不相关
+        return "rejected", None, None
 
-    def _get_strategy(self, category: str, timeliness: str, tool_info: Optional[dict]) -> str:
-        """获取写作策略"""
-        if category == "核心工具类":
-            if timeliness == "热点期":
-                return "🔥 追热点，快写！抢时效，24小时内发布"
+    def _match_topic_types(self, text: str) -> List[str]:
+        """匹配选题类型（可多选）"""
+        matched = []
+        for type_name, type_info in self.topic_types.items():
+            for kw in type_info.keywords:
+                if kw in text:
+                    matched.append(type_name)
+                    break
+        return matched if matched else ["通用型"]
+
+    def _check_timeliness(self, text: str) -> tuple:
+        """检查时效性"""
+        # 紧急热点
+        for kw in self.immediate_keywords:
+            if kw in text:
+                return "紧急热点", self.immediate_boost
+
+        # 近期更新
+        for kw in self.recent_keywords:
+            if kw in text:
+                return "近期更新", self.recent_boost
+
+        # 版本号检测
+        if re.search(r'[vV]\d+(\.\d+)?|\b\d+\.\d+\b', text):
+            return "近期更新", self.recent_boost
+
+        # 常青内容
+        return "常青内容", 1.0
+
+    def _assess_risk(self, layer: str, tool_matched: Optional[str]) -> str:
+        """评估风险等级"""
+        if layer == "layer1" and tool_matched:
+            return "low"
+        elif layer == "layer2":
+            return "medium" if tool_matched else "high"
+        elif layer == "layer3":
+            return "high"
+        return "high"
+
+    def _estimate_reads(self, layer: str, tool_info: Optional[dict],
+                        priority_score: float) -> int:
+        """预估阅读量"""
+        base_reads = {
+            "layer1": 2200,
+            "layer2": 1450,
+            "layer3": 908,
+            "rejected": 500
+        }
+        base = base_reads.get(layer, 500)
+
+        if tool_info and tool_info.get('avg_reads'):
+            base = tool_info['avg_reads']
+
+        # 根据优先级分数调整
+        if priority_score > 200:
+            return int(base * 1.3)
+        elif priority_score > 100:
+            return int(base * 1.1)
+        return base
+
+    def _generate_insights(self, layer, tool, tool_info, types,
+                          timeliness, risk, score) -> List[str]:
+        """生成分析洞察"""
+        insights = []
+
+        # Layer信息
+        layer_names = {
+            "layer1": "核心工具官方",
+            "layer2": "核心工具生态",
+            "layer3": "泛AI话题",
+            "rejected": "不相关"
+        }
+        insights.append(f"🏷️ Layer: {layer.upper()} ({layer_names.get(layer, '未知')})")
+
+        # 工具信息
+        if tool:
+            tier = tool_info.get('tier', 'B') if tool_info else 'B'
+            insights.append(f"🔧 关联工具: {tool} ({tier}级)")
+            if tool_info and tool_info.get('avg_reads'):
+                insights.append(f"📊 历史平均阅读: {tool_info['avg_reads']}")
+
+        # 类型信息
+        if types and types != ["通用型"]:
+            type_icons = {
+                "热点型": "🔥", "工具型": "🛠️", "教程型": "📚",
+                "羊毛型": "💸", "痛点型": "🔧", "测评型": "📊"
+            }
+            type_str = " + ".join([f"{type_icons.get(t, '📌')}{t}" for t in types])
+            insights.append(f"📂 类型: {type_str}")
+
+        # 时效性
+        time_icons = {"紧急热点": "🔴", "近期更新": "🟡", "常青内容": "🟢"}
+        insights.append(f"⏰ 时效: {time_icons.get(timeliness, '⚪')}{timeliness}")
+
+        # 风险
+        risk_icons = {"low": "✅低风险", "medium": "⚠️中风险", "high": "🚨高风险"}
+        insights.append(f"⚡ 风险: {risk_icons.get(risk, '未知')}")
+
+        # 优先级评判
+        if score >= 200:
+            insights.append(f"🎯 优先级: {score}分 → 强烈推荐！")
+        elif score >= 100:
+            insights.append(f"🎯 优先级: {score}分 → 推荐")
+        elif score >= 40:
+            insights.append(f"🎯 优先级: {score}分 → 可写（需要角度）")
+        else:
+            insights.append(f"🎯 优先级: {score}分 → 不推荐")
+
+        return insights
+
+    def _generate_strategy(self, layer, timeliness, score, types) -> tuple:
+        """生成策略建议"""
+        if score >= 200:
+            if timeliness == "紧急热点":
+                return "🔥 抢首发！紧急追热点，快速产出", "24小时内"
             else:
-                return "📚 做教程，慢写。深度内容，打磨质量"
-        elif category == "泛AI话题类":
-            if timeliness == "热点期":
-                return "🎯 博爆款！快速产出，配合热点传播"
-            else:
-                return "🤔 谨慎写。需要独特角度才能破圈"
-        return "不建议"
+                return "✅ 重点推荐！高优先级选题", "48小时内"
 
-    def generate_report(self, result: FilterResultV3, topic: str) -> str:
+        elif score >= 100:
+            if "教程型" in types:
+                return "📚 做深度教程，打磨质量", "可打磨"
+            elif timeliness == "紧急热点":
+                return "⚡ 追热点，快速产出", "24小时内"
+            else:
+                return "👍 值得写，找好角度", "72小时内"
+
+        elif score >= 40:
+            if layer == "layer3":
+                return "🤔 谨慎写，需要独特角度才能破圈", "可打磨"
+            else:
+                return "📝 可以写，但优先级不高", "可打磨"
+
+        else:
+            return "❌ 不建议写，与核心工具无关，风险过高", "不建议"
+
+    def generate_report(self, result: FilterResultV8, topic: str) -> str:
         """生成评估报告"""
         lines = [
-            "=" * 60,
-            "🎯 选题过滤器 V7.1 - 双轨制",
-            "=" * 60,
+            "╔" + "═" * 58 + "╗",
+            "║" + "🎯 选题过滤器 V8.0 - 三层架构版".center(50) + "║",
+            "╚" + "═" * 58 + "╝",
             "",
             f"📝 选题：{topic}",
             "",
-            "-" * 60,
-            f"📂 分类：{result.category}",
-            f"✅ 判断：{'值得写' if result.worth_writing else '不建议写'}",
+            "─" * 60,
         ]
 
-        if result.tool_matched:
-            lines.append(f"🔧 工具：{result.tool_matched}")
+        # 核心判断
+        if result.worth_writing:
+            lines.append(f"✅ 判断：值得写（{result.priority_score}分）")
+        else:
+            lines.append(f"❌ 判断：不建议（{result.priority_score}分）")
 
-        if result.historical_avg_reads:
-            lines.append(f"📊 历史平均阅读：{result.historical_avg_reads}")
+        lines.append("")
 
-        lines.extend([
-            f"⏰ 时效性：{result.timeliness}",
-            "",
-            "-" * 60,
-            f"📋 策略：{result.strategy}",
-            "-" * 60,
-            "",
-            "💡 分析：",
-        ])
-
+        # 分析明细
+        lines.append("📊 分析明细：")
         for insight in result.insights:
             lines.append(f"  {insight}")
 
         lines.extend([
             "",
-            "=" * 60,
-            "📊 V3数据基准（82篇验证）：",
-            "=" * 60,
-            "  核心工具类：54篇，平均阅读 1798",
-            "  泛AI话题类：25篇，平均阅读 908",
+            "─" * 60,
+            f"📋 策略：{result.strategy}",
+            f"⏰ 时间：{result.deadline_hint}",
+            f"📈 预估阅读：{result.avg_reads_estimate}",
             "",
-            "  TOP工具排名：",
-            "  1. Kimi: 3448    2. Gemini: 3146   3. 即梦: 2927",
-            "  4. Claude: 2118  5. Cursor: 1246   6. Codex: 1199",
+            "─" * 60,
+        ])
+
+        # 分数拆解
+        lines.append("🔢 分数拆解：")
+        bd = result.score_breakdown
+        lines.append(f"  Layer基础分: {bd.get('layer_base', 0)}")
+        lines.append(f"  × 时效性加成: {bd.get('timeliness_boost', 1.0)}")
+        lines.append(f"  × 类型权重: {bd.get('type_weight', 1.0):.2f}")
+        lines.append(f"  × 品牌加成: {bd.get('brand_boost', 1.0)}")
+        lines.append(f"  ÷ 风险系数: {bd.get('risk_factor', 1.0)}")
+        lines.append(f"  ────────────")
+        lines.append(f"  = 最终分: {result.priority_score}")
+
+        lines.extend([
+            "",
+            "═" * 60,
+            "📊 V8数据基准（82篇验证）：",
+            "═" * 60,
+            "  Layer1（核心工具官方）：平均阅读 2200，爆款率 71%",
+            "  Layer2（核心工具生态）：平均阅读 1450，爆款率 24%",
+            "  Layer3（泛AI话题）：平均阅读 908，爆款率 5%",
+            "",
+            "  优先级阈值：>200强推 | >100推荐 | >40可写 | <40不推荐",
             "",
         ])
 
@@ -382,24 +461,23 @@ class TopicFilterV3:
 
 def main():
     """命令行入口"""
-    import sys
     import io
-
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     if len(sys.argv) < 2:
         print("用法: python topic_filter.py <选题描述> [额外上下文]")
         print("")
         print("示例:")
-        print("  python topic_filter.py 'Gemini 2.0发布了'")
-        print("  python topic_filter.py 'Claude Code Hooks使用教程'")
+        print("  python topic_filter.py 'Claude Code 2.1发布了'")
+        print("  python topic_filter.py 'Cursor最新MCP插件教程'")
         print("  python topic_filter.py 'AI会取代程序员吗'")
+        print("  python topic_filter.py 'browsertools-mcp神器推荐'")
         sys.exit(1)
 
     topic = sys.argv[1]
     context = sys.argv[2] if len(sys.argv) > 2 else None
 
-    filter_tool = TopicFilterV3()
+    filter_tool = TopicFilterV8()
     result = filter_tool.filter(topic, context)
     print(filter_tool.generate_report(result, topic))
 

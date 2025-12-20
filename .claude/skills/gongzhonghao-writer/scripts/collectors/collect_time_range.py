@@ -6,7 +6,10 @@
 import sys
 import os
 import argparse
+
+# 添加utils目录到路径
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
 
 from wechat_data_collector import WeChatDataCollector, PROJECT_ROOT
 from time_utils import is_within_days, format_absolute_date

@@ -31,10 +31,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/articles/list/route.js"
     ],
+    "/api/data/stats/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/data/stats/route.js"
+    ],
+    "/api/data/collect/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/data/collect/route.js"
+    ],
+    "/api/data/analyze/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/data/analyze/route.js"
+    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/_not-found/page.js"
+    ],
+    "/api/docs/list/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/docs/list/route.js"
     ]
   }
 }

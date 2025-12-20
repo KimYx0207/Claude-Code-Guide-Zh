@@ -97,7 +97,7 @@
 ```json
 {
   "metadata": {
-    "version": "V7.1",
+    "version": "V8.0",
     "generated_at": "2025-12-09",
     "article_count": 82,
     "data_range": "2024-01-01 至 2025-12-08"
@@ -112,8 +112,8 @@
 ```python
 # title_scorer.py
 """
-标题评分器 V7.1 - 基于82篇文章数据验证
-数据版本：rule_validation_report.json V7.1 (2025-12-09)
+标题评分器 V8.0 - 基于82篇文章数据验证
+数据版本：analysis_report.json V8.0 (2025-12-17)
 """
 ```
 
@@ -121,8 +121,8 @@
 <!-- 01-write.md -->
 ---
 name: write
-version: 7.1.0
-data_version: rule_validation_report.json V7.1 (2025-12-09)
+version: 8.0.0
+data_version: analysis_report.json V8.0 (2025-12-17)
 ---
 ```
 

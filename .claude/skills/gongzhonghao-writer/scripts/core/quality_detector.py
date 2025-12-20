@@ -1,26 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-质量检测引擎 V7.1 - 基于82篇文章数据验证
-数据版本：rule_validation_report.json V7.1 (2025-12-09)
-
-老金精心设计的质量检测系统，确保文章质量！
-
-V7.1版本 (2025-12-09):
-- 添加数据版本标注
-- 与rule_validation_report.json V7.1同步
-
-V6版本 (2025-11-25):
-- 配置外部化：从quality-standards.yaml读取阈值
-- 向后兼容：配置文件不存在时使用硬编码默认值
-- 保留V5所有9维度质量标准
-
-V5版本 (2025-11-22):
-- 统一9维度质量标准
-- 啰嗦度阈值：< 25分（V5统一）
-- 重复度阈值：< 15%（V5统一）
-- 脏话检测：严格零容忍（V5新增）
-- 与所有配置文件标准一致
+质量检测引擎 V9.0 - 配置驱动版
+9维度质量检测：AI腔、自然度、真诚度、啰嗦度、重复度、可读性、人味儿、情感、脏话
 """
+
+import sys
+from pathlib import Path
+
+# 添加config目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from config.loader import load_config
 
 import re
 import os
@@ -173,13 +162,24 @@ class QualityDetector:
 
     def __init__(self, config_path: Optional[str] = None):
         """
-        初始化检测器
+        初始化检测器 V8.0 - 配置驱动
 
         Args:
             config_path: 配置文件路径，默认None自动查找
         """
         self.config = self._load_config(config_path)
         self.thresholds = self._extract_thresholds(self.config)
+
+        # V8.0：从配置中心加载规则
+        quality_config = load_config('quality_config')
+
+        # 质检阈值（从配置）
+        if not self.thresholds:
+            self.thresholds = quality_config.get('quality_thresholds', self.DEFAULT_THRESHOLDS)
+
+        # 关键词列表（从配置或默认值）
+        self.AI_TONE_KEYWORDS = quality_config.get('ai_tone_keywords', self.AI_TONE_KEYWORDS)
+        self.PROFANITY_WORDS = quality_config.get('profanity_words', self.PROFANITY_WORDS)
 
         # 从配置更新关键词列表（如果配置文件提供）
         if self.config and 'quality_standards' in self.config:

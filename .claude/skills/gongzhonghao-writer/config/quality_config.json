@@ -1,0 +1,21 @@
+{
+  "version": "V9.0",
+  "quality_thresholds": {
+    "ai_tone": {"max": 20, "reverse": true},
+    "naturalness": {"min": 80},
+    "sincerity": {"min": 75},
+    "verbosity": {"max": 25, "reverse": true},
+    "repetition": {"max": 15, "reverse": true},
+    "readability": {"min": 85},
+    "humanity": {"min": 70},
+    "emotion": {"min": 75},
+    "profanity": {"max": 0, "count": true}
+  },
+
+  "pass_threshold": 70,
+
+  "topic_filter": {
+    "hot_keywords": ["发布", "上线", "更新", "版本", "估值", "融资", "新产品", "新功能", "最新", "刚刚", "今天", "本周"],
+    "tutorial_keywords": ["教程", "指南", "手把手", "对比", "盘点"]
+  }
+}

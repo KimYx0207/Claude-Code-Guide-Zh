@@ -1,0 +1,182 @@
+{
+  "version": "V9.0",
+  "last_updated": "2025-12-17",
+  "data_source": "analysis_report.json",
+  "auto_generated": true,
+  "viral_threshold": {
+    "method": "p75_method",
+    "value": 1375.0,
+    "viral_count": 21,
+    "viral_rate": 25.6
+  },
+  "keywords": {
+    "viral_top10": [
+      [
+        "AI",
+        2.2869
+      ],
+      [
+        "Claude",
+        2.2448
+      ],
+      [
+        "老金",
+        1.8867
+      ],
+      [
+        "Cursor",
+        1.5499
+      ],
+      [
+        "手把手",
+        1.3769
+      ],
+      [
+        "Code",
+        1.1686
+      ],
+      [
+        "Skills",
+        1.0002
+      ],
+      [
+        "一键",
+        0.8616
+      ],
+      [
+        "神器",
+        0.8437
+      ],
+      [
+        "Gemini",
+        0.8343
+      ]
+    ],
+    "all_top10": [
+      [
+        "AI",
+        9.9645
+      ],
+      [
+        "Claude",
+        6.1398
+      ],
+      [
+        "老金",
+        5.9592
+      ],
+      [
+        "Cursor",
+        5.1276
+      ],
+      [
+        "ChatGPT",
+        3.8267
+      ],
+      [
+        "代码",
+        3.6197
+      ],
+      [
+        "Pro",
+        3.5245
+      ],
+      [
+        "Gemini",
+        3.2567
+      ],
+      [
+        "Code",
+        2.9363
+      ],
+      [
+        "项目",
+        2.9135
+      ]
+    ]
+  },
+  "title_length": {
+    "viral_mean": 35.38,
+    "ci_lower": 31.04,
+    "ci_upper": 39.72,
+    "recommendation": "建议标题长度：35字 (95% CI: 31-40字)"
+  },
+  "topics": {
+    "all_distribution": {
+      "教程类": {
+        "count": 16,
+        "percentage": 19.5,
+        "weighted_score": 20.0
+      },
+      "工具类": {
+        "count": 11,
+        "percentage": 13.4,
+        "weighted_score": 13.0
+      },
+      "案例类": {
+        "count": 10,
+        "percentage": 12.2,
+        "weighted_score": 11.0
+      },
+      "测评类": {
+        "count": 7,
+        "percentage": 8.5,
+        "weighted_score": 7.0
+      },
+      "资讯类": {
+        "count": 5,
+        "percentage": 6.1,
+        "weighted_score": 4.0
+      },
+      "技术类": {
+        "count": 1,
+        "percentage": 1.2,
+        "weighted_score": 1.2
+      }
+    },
+    "viral_distribution": {
+      "教程类": {
+        "count": 7,
+        "percentage": 33.3,
+        "weighted_score": 9.0
+      },
+      "工具类": {
+        "count": 6,
+        "percentage": 28.6,
+        "weighted_score": 7.0
+      },
+      "案例类": {
+        "count": 1,
+        "percentage": 4.8,
+        "weighted_score": 1.0
+      },
+      "测评类": {
+        "count": 1,
+        "percentage": 4.8,
+        "weighted_score": 1.0
+      },
+      "资讯类": {
+        "count": 1,
+        "percentage": 4.8,
+        "weighted_score": 0.8
+      }
+    }
+  },
+  "publish_time": {
+    "slot": "22:00-24:00 (深夜)",
+    "stats": {
+      "count": 4,
+      "avg_read": 635.5,
+      "avg_like": 12.0,
+      "total_read": 2542,
+      "ci_read": {
+        "mean": 635.5,
+        "std_error": 401.44,
+        "ci_lower": -642.06,
+        "ci_upper": 1913.06,
+        "confidence_level": 0.95,
+        "sample_size": 4
+      }
+    }
+  }
+}

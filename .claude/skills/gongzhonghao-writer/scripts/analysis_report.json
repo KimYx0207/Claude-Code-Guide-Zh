@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "analysis_date": "2025-12-09T18:42:56.268677",
+    "analysis_date": "2025-12-16T01:41:10.095624",
     "total_articles": 82,
-    "analysis_version": "V7.0_Scientific",
+    "analysis_version": "V8.0_DataDriven",
     "sample_size_warning": false
   },
   "viral_threshold": {
@@ -954,5 +954,6 @@
     "read_like_correlation": 0.8746,
     "interpretation": "正相关，强相关 (r=0.875)"
   },
-  "recommendations": []
+  "recommendations": [],
+  "analysis_version": "V8.0"
 }

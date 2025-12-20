@@ -1,0 +1,36 @@
+{
+  "name": "gongzhonghao-writer",
+  "version": "8.0.0",
+  "description": "公众号写作助手 - V8.0 模块化架构版",
+  "private": true,
+  "scripts": {
+    "dev": "cd web-app/frontend && npm run dev",
+    "build": "cd web-app/frontend && npm run build",
+    "start": "cd web-app/frontend && npm run start",
+    "lint": "cd web-app/frontend && npm run lint",
+    "install:frontend": "cd web-app/frontend && npm install",
+    "test:browser": "playwright test"
+  },
+  "workspaces": [
+    "web-app/frontend"
+  ],
+  "dependencies": {
+    "playwright": "^1.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/gongzhonghao-writer"
+  },
+  "keywords": [
+    "claude-code",
+    "writing-assistant",
+    "wechat",
+    "ai-writer"
+  ],
+  "author": "老金",
+  "license": "MIT"
+}

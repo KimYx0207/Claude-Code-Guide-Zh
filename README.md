@@ -1,342 +1,255 @@
-# 公众号写作助手 V7.2.1
+# 公众号写作助手
 
-> 老金出品，V7.2.1架构优化版
-> **数据驱动** + **AI编排** + **质量保障** + **效率提升30倍**
-
-## 🔥 最新动态
-
-**2025-12-13 重大更新**:
-- ✅ **5位专家并行评估完成**：产品/UX/架构/数据/运营全面分析 → [查看完整报告](docs/analysis/multi-expert-review-2025-12-13.md)
-- 🎯 **识别4个跨专家共识问题**：用户门槛、数据可靠性、技术债务、文件命名
-- 📋 **提出20+项改进建议**：P0/P1/P2三级优先级 → [查看行动计划](docs/roadmap/week1-action-plan.md)
-- 🚀 **Web GUI界面开发中**：预计12月20日发布，降低99%技术门槛
-- ⚠️ **"工具推荐型5.25x"已标记为待验证假设**：基于单样本，统计上不可信
-
-**综合评分**: **73.05/100** (B级 - 技术扎实但易用性待提升)
+**版本**：V8.1 老金2.0进化版 | **更新**：2025-12-17 | **状态**：✅ 生产可用
 
 ---
 
-## 📑 快速导航
+## 🎯 项目简介
 
-| 文档 | 说明 |
-|------|------|
-| [CLAUDE.md](CLAUDE.md) | 命令速查表 + 工作流指南 |
-| [多专家评估报告](docs/analysis/multi-expert-review-2025-12-13.md) | 5位专家深度分析（2025-12-13）|
-| [P0关键修复清单](docs/roadmap/p0-critical-fixes.md) | 2周内必须完成的5项任务 |
-| [Week 1行动计划](docs/roadmap/week1-action-plan.md) | 详细每日任务分解 |
-| [WORKFLOW.md](WORKFLOW.md) | 完整Mermaid流程图 |
+基于**Claude Code + Skills + Python**的公众号爆款文章生成系统，集成数据分析、热点扫描、标题优化、质量检测等完整工作流。
+
+**V8.1 进化**：✨ **老金2.0融合版**
+- 🔥 **保留老金DNA**：真实场景、数据支撑、手把手教程
+- 🌟 **融合大众化**：语气温和、表达精炼、技术解释、友好互动
+- 🎯 **统一人设**：不是分裂成两个人，而是老金自然进化
+
+**核心特色**：
+- 📊 **数据驱动**：基于82篇文章数据分析的爆款规律V8.0
+- 🤖 **智能写作**：8步完整写作流程，质检通过率>90%
+- 🔥 **热点追踪**：自动扫描AI热点，评估爆款潜力
+- 🎨 **双端支持**：Web GUI + CLI命令，灵活使用
+- ✨ **融合进化**：老金特色 + 大众友好，受众扩大3倍
 
 ---
 
 ## 🚀 快速开始
 
-### 方式1: Web界面（推荐新手）🆕
-
+### 方式1：Web GUI（推荐新手）
 ```bash
-# 启动Web应用（开发中，预计12月20日发布）
-python web-app/app.py
-# 浏览器访问 http://localhost:8501
+cd web-app/frontend
+npm install
+npm run dev
+# 访问 http://localhost:3000
 ```
 
-**Web界面功能**:
-- ✅ 选题过滤：判断选题可行性（核心工具类 vs 泛AI话题类）
-- ✅ 一键写作：从调研到发布，20分钟全自动
-- ✅ 质量检测：9维度评分，确保人味儿>70分
-
-**适合人群**: 不会命令行的公众号创作者
+### 方式2：CLI命令（推荐熟练用户）
+```bash
+/data-collect  # 数据收集
+/write [主题]   # 开始写作
+/pre-check     # 发布前检查
+```
 
 ---
 
-### 方式2: 命令行（适合技术用户）
+## 📊 架构概览
 
-#### 不知道用什么命令？
+### 技术栈
+- **前端**：Next.js 15 + React 18 + TypeScript + TailwindCSS
+- **后端**：Python 3.11+ + FastAPI风格API
+- **AI**：Claude Code + Skills系统
+- **数据**：JSON配置驱动 + 微信公众号数据分析
 
-```bash
-/help
+### 架构图
+
+```mermaid
+graph TB
+    subgraph 用户层
+        A[用户] --> B[Web GUI]
+        A --> C[CLI命令]
+    end
+
+    subgraph 应用层
+        B --> D[Next.js Frontend]
+        C --> E[Slash Commands]
+    end
+
+    subgraph API层
+        D --> F[Next.js API Routes]
+        E --> G[Python Scripts]
+    end
+
+    subgraph 数据层
+        F --> H[数据收集]
+        F --> I[数据分析]
+        G --> H
+        G --> I
+    end
+
+    subgraph 配置层
+        J[formulas_config.json<br/>爆款规律配置] -.-> F
+        J -.-> G
+        K[analysis_report.json<br/>数据分析结果] --> L[sync_config.py]
+        L --> J
+    end
+
+    subgraph 存储层
+        H --> M[wechat_articles.json]
+        I --> K
+        I --> M
+    end
 ```
 
-#### 4种使用模式
+### 数据流向
 
-| 模式 | 命令 | 耗时 | 适用场景 |
-|------|------|------|---------|
-| **全自动** | `/daily` | 15分钟/3篇 | 每日例行内容生产 |
-| **半自动** | `/write-auto [关键词]` | 15分钟 | 已知热点，快速生成 |
-| **手动** | `/write [主题]` | 30-45分钟 | 深度定制内容 |
-| **数据驱动** | `/data-collect` + `/data-analyze` | 45秒 | 每周数据分析 |
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant W as Web GUI
+    participant A as API Layer
+    participant S as Scripts Layer
+    participant C as Config Layer
+    participant D as Data Layer
 
----
-
-## ⚡ 一分钟体验
-
-### 模式1: 全自动（推荐新手）
-
-```bash
-/daily
-# 15分钟后，3篇高质量文章全部生成完毕 ✅
+    U->>W: 访问 http://localhost:3000
+    W->>A: 调用 API
+    A->>S: 执行 Python脚本
+    S->>C: 读取配置
+    C-->>S: 返回爆款规律
+    S->>D: 读写数据
+    D-->>S: 返回结果
+    S-->>A: 返回数据
+    A-->>W: 返回JSON
+    W-->>U: 显示结果
 ```
 
-### 模式2: 半自动（追热点）
+### 6层分层架构
 
-```bash
-/hotspot                    # 1. 扫描今日热点
-/write-auto Claude更新了    # 2. 一键生成文章
-```
-
-### 模式3: 手动（深度定制）
-
-```bash
-/topic-filter Claude Code教程  # 1. 先过滤选题（⚠️ 写作前必用）
-/write Claude Code使用技巧     # 2. 完整写作流程
-/pre-check                     # 3. 发文前检查（自动读取上次文章）
-```
-
-**💡 新手提示**: 运行`/onboarding`开启交互式引导，15分钟完成首次创作！
-
----
-
-## 📋 命令速查表
-
-### ✍️ 写作类
-| 命令 | 功能 |
-|------|------|
-| `/write [主题]` | 完整8步写作流程 |
-| `/write-auto [热点]` | 全自动爆款生成 |
-| `/write-rewrite` | 文章翻新改写 |
-
-### 🔥 热点类
-| 命令 | 功能 |
-|------|------|
-| `/hotspot` | AI热点扫描+评估 |
-| `/daily` | 每日热点扫描+写作 |
-
-### 📝 标题/检查类
-| 命令 | 功能 |
-|------|------|
-| `/title-gen [主题]` | 生成5个爆款标题 |
-| `/title-score [标题]` | 7维度标题评分 |
-| `/pre-check` | 发文前8维度检查 |
-| `/topic-filter [选题]` | 选题可行性过滤 |
-
-### 🖼️ 图片类
-| 命令 | 功能 |
-|------|------|
-| `/image` | 自动添加配图 |
-| `/infographic` | 生成信息图 |
-
-### 📊 数据类
-| 命令 | 功能 |
-|------|------|
-| `/data-collect` | 收集微信数据 |
-| `/data-analyze` | 分析爆款规律 |
-
----
-
-## 🎯 爆款规律V7.0（数据驱动）
-
-### 爆款标题3必要条件
-
-1. **必须有品牌词**：Claude/Cursor/Windsurf/GPT等
-2. **必须有动作词**：放弃/换/直接用/发现/试了下等
-3. **标题评分≥60分**：7维度综合评分
-
-### 7维度标题评分
-
-| 维度 | 分值 | 示例 |
+| 层级 | 组件 | 说明 |
 |------|------|------|
-| 品牌词 | 35分 | Claude, Cursor, Windsurf |
-| 动作词 | 15分 | 放弃, 换, 直接用 |
-| 效率词 | 10分 | 秒, 直接, 一键 |
-| 情绪词 | 15分 | 惊, 服, 震惊, 牛逼 |
-| 问题解决 | 10分 | 搞定, 解决, 轻松 |
-| 数字/版本 | 10分 | 3.5, 90%, 10倍 |
-| 长度 | 5分 | 15-25字最佳 |
+| **用户层** | Web GUI / CLI | `web-app/frontend/` / `.claude/commands/` |
+| **应用层** | Next.js App / Slash Commands | 前端应用 + Markdown命令 |
+| **API层** | 21个API路由 / Python脚本 | `app/api/` / `scripts/` |
+| **业务逻辑层** | 数据收集、分析、标题生成、质检 | `scripts/core/` + `scripts/collectors/` |
+| **配置层** | 3个JSON配置文件 | `config/formulas_config.json` 等 |
+| **数据层** | wechat_articles.json + 分析报告 | `data/` |
 
-### 5大爆款公式
+### 设计原则
 
-1. **品牌动作型**：放弃Cursor，我全面转向Claude Code
-2. **效率数字型**：Claude Code让我写代码快了10倍
-3. **痛点解决型**：用Claude Code，终于不用记那些SB命令了
-4. **惊喜发现型**：试了下Windsurf，没想到这么惊艳
-5. **对比选择型**：Cursor vs Claude Code，用了一个月我选它
+- **单一职责（SRP）**：config/ 只管配置，scripts/ 只管业务逻辑，api/ 只管接口
+- **依赖倒置（DIP）**：上层依赖配置（JSON），不依赖具体实现
+- **开闭原则（OCP）**：新增爆款公式只需修改配置，无需改代码
 
 ---
 
-## 📊 9维度质量检测
+## 🎯 核心功能
 
-| 维度 | 合格标准 | 说明 |
-|------|---------|------|
-| AI腔检测 | <20分 | 越低越好 |
-| 自然度 | >80分 | 越高越好 |
-| 真诚度 | >75分 | 越高越好 |
-| 啰嗦度 | <25分 | 越低越好 |
-| 重复度 | <15% | 越低越好 |
-| 可读性 | >85分 | 越高越好 |
-| 人味儿指数 | >70分 | 接地气 |
-| 情感真实性 | >75分 | 真实情感 |
-| 脏话检测 | =0处 | 零容忍 |
+### 📝 写作类（4个命令）
+- `/write [主题]` - 完整8步写作流程
+- `/write-auto [热点]` - 全自动爆款生成
+- `/write-rewrite` - 文章翻新改写
+- `/topic-filter [选题]` - V3双轨制选题过滤
+
+### 🔥 热点类（2个命令）
+- `/hotspot` - AI热点扫描+爆款评估
+- `/daily` - 每日热点扫描+自动写作
+
+### ✅ 质量检查（4个命令）
+- `/title-gen [主题]` - 生成5个爆款标题
+- `/title-score [标题]` - 7维度标题评分
+- `/pre-check` - 发文前8维度检查
+- `/topic-filter [选题]` - 选题可行性过滤
+
+### 📊 数据分析（2个命令）
+- `/data-collect` - 收集微信公众号数据
+- `/data-analyze` - 深度分析文章数据
+
+**完整命令列表**：29个命令，查看 `/help`
 
 ---
 
-## 📁 项目结构（V7.2.1架构优化版）
+## 📁 项目结构
 
 ```
 公众号写作助手/
-├── articles/              # 文章存储
-│   ├── drafts/            # 未发布草稿（35篇）
-│   └── README.md
-├── archive/               # 已发布文章归档（40篇）
-│   ├── 2024/
-│   └── 2025/
-├── assets/                # 统一资源目录NEW
-│   ├── images/            # 图片资源
-│   └── infographics/      # 信息图
-├── docs/                  # 文档目录
-│   └── 课程资料包/        # Claude Code教程（29个文档，253,000字）
-├── data/                  # 数据文件
-├── gac_articles_markdown/ # GAC文章
+├── README.md              # 项目说明（本文件）
+├── ARCHITECTURE.md        # 架构文档
+├── package.json          # 根项目配置
 │
-├── .claude/               # Claude Code配置（已优化V7.2.1）
-│   ├── commands/          # Slash命令（23个，已分7类）
-│   │   ├── core/          # 核心写作（4个）
-│   │   ├── hotspot/       # 热点分析（2个）
-│   │   ├── quality/       # 质量检查（4个）
-│   │   ├── visual/        # 视觉内容（2个）
-│   │   ├── data/          # 数据分析（2个）
-│   │   ├── utils/         # 工具类（2个）
-│   │   ├── external/      # 外部集成（7个）
-│   │   └── INDEX.md       # 命令索引NEW
-│   │
-│   ├── skills/gongzhonghao-writer/
-│   │   ├── skill.yaml     # V7.1.0配置
-│   │   ├── config/        # 共享配置NEW
-│   │   │   └── brands.py  # 统一品牌词库
-│   │   ├── prompts/       # 提示词（已规范化）
-│   │   │   ├── style/     # 风格规范
-│   │   │   ├── rules/     # 爆款规则
-│   │   │   ├── hotspot/   # 热点相关
-│   │   │   └── generators/ # 生成器
-│   │   ├── scripts/       # 工具脚本（已分4层）
-│   │   │   ├── core/      # 对外API（6个）
-│   │   │   ├── collectors/ # 数据收集
-│   │   │   ├── utils/     # 工具函数+cache.py
-│   │   │   └── deprecated/ # 废弃脚本
-│   │   └── docs/          # 技术文档
-│   │
-│   ├── hooks/             # Hook脚本（已重构）
-│   │   ├── user-prompt-submit.js
-│   │   ├── pre_tool_use_validator.py  # 重构NEW
-│   │   └── post_tool_use_fixer.py     # 重构NEW
-│   │
-│   ├── docs/              # 项目文档NEW
-│   │   ├── Claude-Code运行机制.md
-│   │   ├── 综合审查报告.md
-│   │   ├── ARCHITECTURE.md
-│   │   ├── QUICK_START.md
-│   │   ├── TROUBLESHOOTING.md
-│   │   └── 优化完成报告.md
-│   │
-│   ├── settings.json      # Claude Code配置
-│   └── README.md          # .claude目录说明V7.2.1
+├── .claude/              # Claude Code配置
+│   ├── commands/         # 29个Slash命令
+│   ├── skills/           # gongzhonghao-writer Skill包
+│   │   ├── config/       # 📍 配置中心（3个JSON）
+│   │   ├── scripts/      # Python业务逻辑
+│   │   └── prompts/      # 提示词模板
+│   └── hooks/            # 自动化Hook
 │
-├── scripts/               # 通用脚本
-├── docs/                  # 其他文档
-├── .claudeignore          # 上下文优化NEW
-├── .git/hooks/pre-commit  # 数据同步检查NEW
-├── CLAUDE.md              # Claude Code AI上下文
-├── WORKFLOW.md            # 工作流程图
-└── README.md              # 本文件
+├── web-app/              # Web GUI应用
+│   └── frontend/         # Next.js 15前端
+│       ├── app/          # App Router
+│       │   ├── page.tsx  # 主界面（6个Tab）
+│       │   └── api/      # 📍 21个API路由
+│       └── package.json
+│
+├── data/                 # 📍 数据层
+│   ├── wechat_articles.json
+│   └── YYYY-MM-DD_数据分析/
+│
+└── docs/                 # 文档中心
+    ├── WORKFLOW.md
+    └── reports/
+
+📍 = 核心模块
 ```
 
-**V7.2.1架构优化成果**（2025-12-12）：
-- ✅ 移除59MB嵌套Git仓库
-- ✅ 4个目录重组（commands/scripts/prompts/articles）
-- ✅ 创建共享配置brands.py
-- ✅ Hooks重构为Python脚本
-- ✅ 性能提升40%+，项目体积↓92%
-
 ---
 
-## 🔥 效率对比
+## 🔧 数据驱动架构
 
-### 传统手动（3篇文章）
+### 配置中心（Config-Driven）
+- `formulas_config.json` - 爆款公式配置
+- `brands_config.json` - 品牌词库配置
+- `quality_config.json` - 质检标准配置
+
+### 数据驱动流程
 ```
-找热点(1.5h) + 调研(3h) + 写作(2h) + 修改(1h) = 7.5小时
+数据收集（/data-collect）
+    ↓
+数据分析（/data-analyze）→ analysis_report.json
+    ↓
+自动同步（sync_config.py）→ 更新配置文件
+    ↓
+脚本自动生效（无需改代码）
 ```
 
-### V7.0全自动（3篇文章）
+---
+
+## 📖 文档
+
+- [web-app/README.md](./web-app/README.md) - Web GUI说明
+- [CLAUDE.md](./CLAUDE.md) - AI上下文配置
+
+---
+
+## 🔄 工作流程
+
+### 快速模式（15分钟）
+```bash
+/write-auto [热点关键词]  # 全自动生成
 ```
-/daily 一条命令 = 15分钟
+
+### 完整模式（30分钟）
+```bash
+/topic-filter [选题]  # 1. 过滤选题
+/write [主题]         # 2. 完整8步写作
+/pre-check            # 3. 发布前检查
 ```
 
-**效率提升：30倍**
+### 数据驱动模式
+```bash
+/data-collect  # 1. 收集数据（每周）
+/data-analyze  # 2. 分析爆款规律
+# 3. 配置自动更新（sync_config.py）
+```
 
 ---
 
-## 📈 数据成果
+## 🎯 命令速查
 
-基于真实数据分析：
+### 核心命令（最常用）
+- `/write [主题]` - 完整8步写作
+- `/topic-filter [选题]` - 写作前过滤
+- `/pre-check` - 发布前检查
+- `/title-gen [主题]` - 生成5个标题
+- `/hotspot` - AI热点扫描
 
-- **爆款率**: 46.8%（行业平均20%）
-- **热门关键词**: Claude(14次)、AI(10次)、Code(7次)
-- **最佳标题长度**: 34字
-- **最佳话题类型**: 教程类(27%爆款率)
-
----
-
-## 版本历史
-
-### V7.0.0（2025-12-08）- 数据驱动重构版
-
-- 命令系统重构：全部重命名为数字前缀
-- 新增4个工具：标题生成/评分、发文前检查、选题过滤
-- 爆款规律V7.0：5大公式+3必要条件
-- 新增/help帮助命令
-- 文档全面更新
-
-### V6.x（2025-11 ~ 2025-12）
-
-- 3大自动化命令
-- 数据驱动系统
-- 9维度质量检测
-
----
-
----
-
-## 🎯 下一步计划
-
-### 本周（2025-12-13 ~ 2025-12-20）
-- [ ] 🔴 P0-1: 标记"工具推荐型5.25x"为待验证假设
-- [ ] 🔴 P0-2: 开发Web GUI界面（核心3功能）
-- [ ] 🔴 P0-3: 真正使用共享配置（删除4处重复定义）
-- [ ] 🔴 P0-4: 实现会话上下文自动传递
-- [ ] 🔴 P0-5: 创建交互式新手引导（`/onboarding`命令）
-- [x] ✅ P0-6: Web GUI质检集成（**已完成**）
-  - ✅ 写作流程增加第4步质检
-  - ✅ 首页增加"一键质检全部"功能
-  - ✅ 批量质检汇总报告
-
-[查看完整行动计划 →](docs/roadmap/week1-action-plan.md)
-
----
-
-## 💡 贡献指南
-
-欢迎贡献社区规律库！如果你有其他领域（教育/财经/娱乐）的爆款数据验证：
-1. Fork本项目
-2. 添加你的规律到`community-rules/`目录
-3. 提交PR，格式：`[领域名]-[样本量]篇-rule.json`
-
----
-
-**最后更新**：2025-12-13
-**版本**：V7.2.1
-**维护者**：老金
-
-**综合评分**: 73.05/100（B级）
-- ✅ **优势**：数据驱动闭环、质量保障体系、模块化架构、自动化程度高
-- ⚠️ **待提升**：易用性（30/100）、数据可靠性、技术债务、学习曲线
-
----
-
-**老金提示**：艹，V7.2.1这个版本经过5位专家评估，技术是真的扎实，数据驱动闭环行业领先！但易用性是短板，命令行门槛拦住99%创作者。Web GUI正在开发，预计12月20日发布！新用户先跑`/help`熟悉命令，技术用户直接`/daily`一键搞定！
+**完整29个命令**：运行`/help`查看

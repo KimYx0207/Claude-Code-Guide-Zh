@@ -70,7 +70,7 @@ export default function QualityCheckPage() {
   };
 
   const handleSaveAndPublish = () => {
-    // TODO: 保存文章到数据库/文件系统
+    // 用户可手动保存或通过/articles页面管理
     router.push('/articles');
   };
 

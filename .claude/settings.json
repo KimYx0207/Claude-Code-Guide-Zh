@@ -33,6 +33,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/webui-auto-build.py",
+            "timeout": 120
+          }
+        ]
       }
     ]
   }

@@ -3,7 +3,7 @@
 ## 一、写作前必读（MANDATORY）
 
 ### 1.1 读取所有规则文档
-- [ ] 读取 `laojin-style-v6-natural.md`（老金风格规范）
+- [ ] 读取 `laojin-style-v8.md`（老金V8风格规范）
 - [ ] 读取 `baokuan-rules.md`（爆款12大公式）
 - [ ] 读取 `auto-image-generator.md`（配图规则）
 - [ ] 读取 `infographic-generator.md`（信息图规则）
@@ -231,7 +231,7 @@ node remove_profanity.js [文章路径]
 在提交文章前，必须确认以下所有项：
 
 ### 必读规则
-- [x] 读取laojin-style-v6-natural.md
+- [x] 读取laojin-style-v8.md
 - [x] 读取baokuan-rules.md
 - [x] 读取auto-image-generator.md
 - [x] 读取infographic-generator.md

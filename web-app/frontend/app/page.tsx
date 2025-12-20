@@ -3,11 +3,29 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import dynamic from 'next/dynamic';
+import HelpTab from './components/HelpTab';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
-type TabView = 'home' | 'hotspot' | 'write' | 'data' | 'docs';
+// 动态导入Monaco Editor（仅客户端）
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-center py-8">
+      <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-2"></div>
+      <p className="text-gray-500">编辑器加载中...</p>
+    </div>
+  )
+});
+
+type TabView = 'home' | 'hotspot' | 'write' | 'data' | 'docs' | 'help';
 
 export default function Home() {
   const [currentTab, setCurrentTab] = useState<TabView>('home');
+  const [hotspotToWrite, setHotspotToWrite] = useState<string>('');
+  const [articleToEdit, setArticleToEdit] = useState<{ title: string; content: string } | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -76,17 +94,28 @@ export default function Home() {
             >
               📚 教程资料
             </button>
+            <button
+              onClick={() => setCurrentTab('help')}
+              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                currentTab === 'help'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              🆘 帮助中心
+            </button>
           </div>
         </div>
       </header>
 
       {/* 主内容区 */}
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {currentTab === 'home' && <HomeTab />}
-        {currentTab === 'hotspot' && <HotspotTab />}
-        {currentTab === 'write' && <WriteTab setCurrentTab={setCurrentTab} />}
+        {currentTab === 'home' && <HomeTab setCurrentTab={setCurrentTab} setArticleToEdit={setArticleToEdit} onArticleDeleted={() => {/* 刷新列表 */}} />}
+        {currentTab === 'hotspot' && <HotspotTab setCurrentTab={setCurrentTab} setHotspotToWrite={setHotspotToWrite} />}
+        {currentTab === 'write' && <WriteTab setCurrentTab={setCurrentTab} initialTopic={hotspotToWrite} editArticle={articleToEdit} />}
         {currentTab === 'data' && <DataTab />}
         {currentTab === 'docs' && <DocsTab />}
+        {currentTab === 'help' && <HelpTab />}
       </main>
     </div>
   );
@@ -96,7 +125,15 @@ export default function Home() {
 // Tab 1: 首页（数据看板+文章管理）
 // ============================================================
 
-function HomeTab() {
+function HomeTab({
+  setCurrentTab,
+  setArticleToEdit,
+  onArticleDeleted
+}: {
+  setCurrentTab: (tab: TabView) => void;
+  setArticleToEdit: (article: { title: string; content: string } | null) => void;
+  onArticleDeleted: () => void;
+}) {
   const [articles, setArticles] = useState<any[]>([]);
   const [articleSubTab, setArticleSubTab] = useState<'draft' | 'published'>('draft');
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -197,6 +234,59 @@ function HomeTab() {
       }
     } catch (error) {
       alert('质检失败');
+    }
+  };
+
+  // 编辑文章
+  const handleEditArticle = async (articleId: string) => {
+    try {
+      const res = await fetch('/api/articles/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articleId })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setArticleToEdit({
+          title: data.data.title,
+          content: data.data.content
+        });
+        setCurrentTab('write');
+      } else {
+        alert(`❌ 加载文章失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`❌ 加载文章失败：${error.message}`);
+    }
+  };
+
+  // 删除文章
+  const handleDeleteArticle = async (articleId: string) => {
+    if (!confirm(`确认删除文章：${articleId}？\n\n此操作不可恢复！`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/articles/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articleId, confirm: true })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert('✅ 文章删除成功');
+        // 刷新列表
+        loadArticles();
+        onArticleDeleted();
+      } else {
+        alert(`❌ 删除失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`❌ 删除失败：${error.message}`);
     }
   };
 
@@ -332,7 +422,13 @@ function HomeTab() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">编辑</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditArticle(article.id)}
+                    >
+                      编辑
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -340,7 +436,14 @@ function HomeTab() {
                     >
                       质检
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">删除</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => handleDeleteArticle(article.id)}
+                    >
+                      删除
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -403,9 +506,35 @@ function HomeTab() {
               <Button variant="outline" onClick={() => setShowSummary(false)}>
                 关闭
               </Button>
-              <Button onClick={() => {
-                setShowSummary(false);
-                alert('导出功能开发中');
+              <Button onClick={async () => {
+                try {
+                  const res = await fetch('/api/reports/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ summary })
+                  });
+
+                  const data = await res.json();
+
+                  if (data.success) {
+                    // 创建下载
+                    const blob = new Blob([data.data.content], { type: 'text/markdown' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = data.data.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    alert('✅ 报告导出成功！');
+                  } else {
+                    alert(`❌ 导出失败：${data.error}`);
+                  }
+                } catch (error: any) {
+                  alert(`❌ 导出失败：${error.message}`);
+                }
               }}>
                 导出报告
               </Button>
@@ -421,49 +550,182 @@ function HomeTab() {
 // Tab 2: 写作（垂直布局，4个功能区）
 // ============================================================
 
-function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) {
-  const [topic, setTopic] = useState('');
+function WriteTab({
+  setCurrentTab,
+  initialTopic = '',
+  editArticle = null
+}: {
+  setCurrentTab: (tab: TabView) => void;
+  initialTopic?: string;
+  editArticle?: { title: string; content: string } | null;
+}) {
+  const [topic, setTopic] = useState(initialTopic);
   const [topicResult, setTopicResult] = useState<any>(null);
   const [article, setArticle] = useState('');
   const [titles, setTitles] = useState<any[]>([]);
   const [selectedTitle, setSelectedTitle] = useState('');
   const [qualityResult, setQualityResult] = useState<any>(null);
+  const [precheckResult, setPrecheckResult] = useState<any>(null);
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [titleLoading, setTitleLoading] = useState(false);
+  const [precheckLoading, setPrecheckLoading] = useState(false);
 
-  // 功能1：选题过滤
+  // 当从热点跳转过来时，自动触发选题过滤
+  useEffect(() => {
+    if (initialTopic && initialTopic.trim()) {
+      setTopic(initialTopic);
+      // 自动触发选题过滤
+      setTimeout(() => {
+        handleTopicFilter();
+      }, 500);
+    }
+  }, [initialTopic]);
+
+  // 当从首页编辑文章时，预填内容
+  useEffect(() => {
+    if (editArticle) {
+      setSelectedTitle(editArticle.title);
+      setArticle(editArticle.content);
+      // 从内容中提取主题（去掉标题后的第一段）
+      const lines = editArticle.content.split('\n');
+      const firstParagraph = lines.find(line => line.trim() && !line.startsWith('#'));
+      if (firstParagraph) {
+        setTopic(editArticle.title);  // 用标题作为主题
+      }
+    }
+  }, [editArticle]);
+
+  // 功能6：保存文章（真实实现）
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const handleSaveArticle = async (forcePublish = false) => {
+    if (!article.trim() || !selectedTitle.trim()) {
+      alert('请先完成文章创作和标题选择');
+      return;
+    }
+
+    setSaveLoading(true);
+    try {
+      const res = await fetch('/api/articles/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: selectedTitle,
+          content: article,
+          topic: topic,
+          status: forcePublish ? 'published' : 'draft'
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`✅ 文章保存成功！\n文件名：${data.data.fileName}\n状态：${forcePublish ? '已发布' : '草稿'}`);
+        // 可选：跳转到首页查看文章列表
+        // setCurrentTab('home');
+      } else {
+        alert(`❌ 保存失败：${data.error}\n${data.hint || ''}`);
+      }
+    } catch (error: any) {
+      alert(`❌ 保存失败：${error.message}`);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  // 功能1：选题过滤（调用真实API）
   const handleTopicFilter = async () => {
     if (!topic.trim()) return;
 
-    // 模拟选题过滤结果
-    setTopicResult({
-      category: '核心工具类',
-      timeliness: '热点期',
-      worthWriting: true,
-      avgReads: 1798,
-      suggestion: '✅ A级选题，建议快速写作'
-    });
+    setFilterLoading(true);
+    try {
+      const res = await fetch('/api/topic/filter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setTopicResult(data.data);
+      } else {
+        alert(`选题过滤失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`选题过滤失败：${error.message}`);
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
-  // 功能2：开始写作
+  // 功能2：开始写作（调用真实API）
+  const [articleLoading, setArticleLoading] = useState(false);
+
   const handleGenerateArticle = async () => {
-    if (!topic.trim()) return;
+    if (!topic.trim()) {
+      alert('请先输入主题');
+      return;
+    }
 
-    setArticle(`# ${selectedTitle || topic}\n\n这是AI生成的文章内容...\n\n（完整文章内容）`);
+    setArticleLoading(true);
+    try {
+      // 使用/api/write/auto（快速生成）或/api/write/full（深度教程）
+      const res = await fetch('/api/write/auto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const generatedArticle = selectedTitle
+          ? `# ${selectedTitle}\n\n${data.data.content.replace(/^#\s*.+\n/, '')}`  // 替换自动生成的标题
+          : data.data.content;
+
+        setArticle(generatedArticle);
+
+        // 提示用户
+        const strategy = data.data.strategy || '模板';
+        alert(`✅ 文章生成完成！\n生成方式：${strategy}\n字数：${data.data.wordCount}字\n\n💡 提示：配置环境变量可使用OpenAI或Claude生成更好的文章`);
+      } else {
+        alert(`❌ 文章生成失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`❌ 文章生成失败：${error.message}`);
+    } finally {
+      setArticleLoading(false);
+    }
   };
 
-  // 功能3：生成标题
+  // 功能3：生成标题（调用真实API）
   const handleGenerateTitles = async () => {
     if (!topic.trim()) return;
 
-    setTitles([
-      { title: `老金用${topic}半年才知道，原来一直少装了这个神器`, formula: '工具推荐型', score: 85 },
-      { title: `${topic}开始限制了？手把手教你怎么过`, formula: '痛点解决型', score: 78 },
-      { title: `${topic}这个功能真的绝了，一键搞定所有问题`, formula: '效率承诺型', score: 72 },
-      { title: `试了下${topic}，没想到这么惊艳`, formula: '惊喜发现型', score: 68 },
-      { title: `${topic}更新了，这3个新功能必须知道`, formula: '版本解读型', score: 65 },
-    ]);
+    setTitleLoading(true);
+    try {
+      const res = await fetch('/api/title/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setTitles(data.data.titles || []);
+      } else {
+        alert(`标题生成失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`标题生成失败：${error.message}`);
+    } finally {
+      setTitleLoading(false);
+    }
   };
 
-  // 功能4：质量检测
+  // 功能4：质量检测（已集成真实API）
   const handleQualityCheck = async () => {
     if (!article.trim()) return;
 
@@ -484,6 +746,38 @@ function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) 
     }
   };
 
+  // 功能5：发文前检查（调用真实API）
+  const handlePrecheck = async () => {
+    if (!article.trim() || !selectedTitle.trim()) {
+      alert('请先完成文章创作和标题选择');
+      return;
+    }
+
+    setPrecheckLoading(true);
+    try {
+      const res = await fetch('/api/write/precheck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: selectedTitle,
+          content: article
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setPrecheckResult(data.data);
+      } else {
+        alert(`发文前检查失败：${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`发文前检查失败：${error.message}`);
+    } finally {
+      setPrecheckLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 功能区1：选题过滤 */}
@@ -496,31 +790,52 @@ function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) 
             onChange={(e) => setTopic(e.target.value)}
             className="flex-1"
           />
-          <Button onClick={handleTopicFilter} disabled={!topic.trim()}>
-            判断可行性
+          <Button onClick={handleTopicFilter} disabled={!topic.trim() || filterLoading}>
+            {filterLoading ? '过滤中...' : '判断可行性'}
           </Button>
         </div>
 
         {topicResult && (
-          <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className={`rounded-lg border p-4 ${topicResult.score >= 80 ? 'bg-green-50 border-green-200' : topicResult.score >= 70 ? 'bg-blue-50 border-blue-200' : 'bg-yellow-50 border-yellow-200'}`}>
+            <div className="mb-3">
+              <span className="text-2xl font-bold">
+                {topicResult.boomPotential === '高' ? '🏆' : topicResult.boomPotential === '中高' ? '⭐' : '✅'}
+              </span>
+              <span className="ml-2 text-lg font-bold text-gray-900">
+                爆款潜力：{topicResult.boomPotential}（{topicResult.score}分）
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm mb-3">
               <div>
                 <span className="font-medium">分类：</span>
-                <span className="text-blue-700">{topicResult.category}</span>
+                <span className="text-gray-700">{topicResult.category}</span>
               </div>
               <div>
                 <span className="font-medium">时效性：</span>
-                <span className="text-blue-700">{topicResult.timeliness}</span>
+                <span className="text-gray-700">{topicResult.timeliness}</span>
               </div>
               <div>
                 <span className="font-medium">历史平均阅读：</span>
-                <span className="text-blue-700">{topicResult.avgReads}</span>
+                <span className="font-bold text-purple-600">{topicResult.avgReads}</span>
               </div>
-              <div>
-                <span className="font-medium">建议：</span>
-                <span className="text-blue-700">{topicResult.suggestion}</span>
-              </div>
+              {topicResult.matchedBrand && (
+                <div>
+                  <span className="font-medium">匹配品牌：</span>
+                  <span className="text-gray-700">{topicResult.matchedBrand}</span>
+                </div>
+              )}
             </div>
+            <div className="bg-white rounded p-3">
+              <p className="font-medium text-gray-900 mb-2">💡 分析建议：</p>
+              <ul className="text-sm text-gray-700 space-y-1">
+                {topicResult.suggestions.map((sugg: string, idx: number) => (
+                  <li key={idx}>• {sugg}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-3 text-center font-bold text-lg">
+              {topicResult.recommendation}
+            </p>
           </div>
         )}
       </div>
@@ -528,8 +843,8 @@ function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) 
       {/* 功能区2：生成标题 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">📝 步骤2：生成标题</h3>
-        <Button onClick={handleGenerateTitles} disabled={!topic.trim()} className="mb-4">
-          生成5个爆款标题
+        <Button onClick={handleGenerateTitles} disabled={!topic.trim() || titleLoading} className="mb-4">
+          {titleLoading ? '生成中...' : '生成5个爆款标题'}
         </Button>
 
         {titles.length > 0 && (
@@ -561,17 +876,31 @@ function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) 
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">✍️ 步骤3：编辑文章</h3>
         <div className="mb-4">
-          <Button onClick={handleGenerateArticle} disabled={!selectedTitle && !topic.trim()}>
-            一键生成文章
+          <Button
+            onClick={handleGenerateArticle}
+            disabled={!topic.trim() || articleLoading}
+          >
+            {articleLoading ? '生成中...' : '一键生成文章'}
           </Button>
         </div>
 
-        <textarea
-          value={article}
-          onChange={(e) => setArticle(e.target.value)}
-          className="w-full h-96 p-4 border border-gray-200 rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="点击上方按钮生成文章，或手动编辑..."
-        />
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <MonacoEditor
+            height="400px"
+            defaultLanguage="markdown"
+            value={article}
+            onChange={(value) => setArticle(value || '')}
+            theme="vs-light"
+            options={{
+              minimap: { enabled: false },
+              fontSize: 14,
+              lineNumbers: 'on',
+              wordWrap: 'on',
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+            }}
+          />
+        </div>
       </div>
 
       {/* 功能区4：质量检测 */}
@@ -613,20 +942,96 @@ function WriteTab({ setCurrentTab }: { setCurrentTab: (tab: TabView) => void }) 
             {/* 操作按钮 */}
             <div className="flex gap-3">
               {qualityResult.isPassed ? (
-                <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => alert('保存功能开发中')}>
-                  ✅ 保存并发布
+                <Button
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={() => handleSaveArticle(false)}
+                  disabled={saveLoading}
+                >
+                  {saveLoading ? '保存中...' : '✅ 保存为草稿'}
                 </Button>
               ) : (
                 <>
-                  <Button variant="outline" className="flex-1">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      // 回到编辑器顶部
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
                     修改文章
                   </Button>
-                  <Button className="flex-1 bg-yellow-600 hover:bg-yellow-700" onClick={() => alert('保存功能开发中')}>
-                    ⚠️ 仍要发布
+                  <Button
+                    className="flex-1 bg-yellow-600 hover:bg-yellow-700"
+                    onClick={() => handleSaveArticle(false)}
+                    disabled={saveLoading}
+                  >
+                    {saveLoading ? '保存中...' : '⚠️ 仍要保存'}
                   </Button>
                 </>
               )}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* 功能区5：发文前检查 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">🔍 步骤5：发文前检查（可选）</h3>
+        <div className="mb-4">
+          <Button
+            onClick={handlePrecheck}
+            disabled={!article.trim() || !selectedTitle.trim() || precheckLoading}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            {precheckLoading ? '检查中...' : '🔍 8维度最终检查'}
+          </Button>
+        </div>
+
+        {precheckResult && (
+          <div className="space-y-4">
+            {/* 检查摘要 */}
+            <div className={`rounded-lg p-6 text-center ${precheckResult.summary.isPassed ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}`}>
+              <p className="text-sm text-gray-600 mb-2">通过率</p>
+              <p className="text-4xl font-bold mb-2">
+                {precheckResult.summary.passedChecks}/{precheckResult.summary.totalChecks}
+              </p>
+              <p className="text-sm text-gray-600 mb-1">平均分：{precheckResult.summary.avgScore}分</p>
+              <p className={`text-lg font-semibold ${precheckResult.summary.isPassed ? 'text-green-700' : 'text-yellow-700'}`}>
+                {precheckResult.summary.result}
+              </p>
+            </div>
+
+            {/* 8维度检查详情 */}
+            <div className="grid grid-cols-2 gap-3">
+              {precheckResult.checks.map((check: any, idx: number) => (
+                <div
+                  key={idx}
+                  className={`rounded-lg p-4 ${check.status ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-gray-900">{check.dimension}</span>
+                    <span className={`text-2xl ${check.status ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {check.status ? '✅' : '⚠️'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{check.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">评分：{check.score}/100</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 优化建议 */}
+            {precheckResult.suggestions.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="font-medium text-yellow-800 mb-2">📋 优化建议：</p>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  {precheckResult.suggestions.map((sugg: string, idx: number) => (
+                    <li key={idx}>• {sugg}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -668,7 +1073,13 @@ function ScoreCard({
 // Tab 3: 热点扫描
 // ============================================================
 
-function HotspotTab() {
+function HotspotTab({
+  setCurrentTab,
+  setHotspotToWrite
+}: {
+  setCurrentTab: (tab: TabView) => void;
+  setHotspotToWrite: (topic: string) => void;
+}) {
   const [hotspots, setHotspots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [scanDate, setScanDate] = useState('');
@@ -767,13 +1178,22 @@ function HotspotTab() {
                     <Button
                       className="bg-blue-600 hover:bg-blue-700"
                       onClick={() => {
-                        // TODO: 跳转到写作Tab并预填主题
-                        alert('一键写作功能开发中');
+                        // 跳转到写作Tab并预填主题
+                        setHotspotToWrite(item.title);
+                        setCurrentTab('write');
                       }}
                     >
                       ✍️ 一键写作
                     </Button>
-                    <Button variant="outline">查看原文</Button>
+                    <Button variant="outline" onClick={() => {
+                      if (item.url) {
+                        window.open(item.url, '_blank');
+                      } else {
+                        alert('暂无原文链接');
+                      }
+                    }}>
+                      查看原文
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -798,6 +1218,8 @@ function HotspotTab() {
 function DataTab() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [collecting, setCollecting] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -816,6 +1238,69 @@ function DataTab() {
       console.error('加载统计数据失败:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 收集数据（自动爬取）
+  const handleCollectData = async () => {
+    setCollecting(true);
+    try {
+      const res = await fetch('/api/data/collect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`✅ 数据收集完成！\n收集到 ${data.data.collectedCount} 篇文章\n\n下一步：点击"分析数据"按钮`);
+        // 收集完成后自动刷新统计
+        loadStats();
+      } else {
+        // 显示详细错误信息和解决方案
+        let errorMsg = `❌ 数据收集失败：${data.error}`;
+
+        if (data.solution) {
+          const os = navigator.platform.toLowerCase();
+          const isWin = os.includes('win');
+          const isMac = os.includes('mac');
+
+          const command = isWin ? data.solution.windows : isMac ? data.solution.mac : data.solution.linux;
+
+          errorMsg += `\n\n📋 解决步骤：\n${data.solution.steps.join('\n')}`;
+          errorMsg += `\n\n💻 启动命令：\n${command}`;
+        }
+
+        alert(errorMsg);
+      }
+    } catch (error: any) {
+      alert(`❌ 数据收集失败：${error.message}`);
+    } finally {
+      setCollecting(false);
+    }
+  };
+
+  // 分析数据（调用真实Python脚本）
+  const handleAnalyzeData = async () => {
+    setAnalyzing(true);
+    try {
+      const res = await fetch('/api/data/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`✅ 数据分析完成！\n报告已保存到：${data.data.reportPath}`);
+        // 分析完成后自动刷新统计
+        loadStats();
+      } else {
+        alert(`❌ 数据分析失败：${data.error}\n${data.hint || ''}`);
+      }
+    } catch (error: any) {
+      alert(`❌ 数据分析失败：${error.message}`);
+    } finally {
+      setAnalyzing(false);
     }
   };
 
@@ -838,7 +1323,56 @@ function DataTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">📊 数据分析报告</h2>
+      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">关于数据收集</h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p className="mb-2">
+                <strong>Web GUI暂不支持全自动收集</strong>（技术限制：无法调用MCP浏览器工具）
+              </p>
+              <p className="mb-2">
+                <strong>推荐方案：使用CLI命令（真正全自动）</strong>
+              </p>
+              <div className="bg-yellow-100 p-3 rounded mt-2 font-mono text-xs">
+                <p className="mb-1"># 在Claude Code终端运行：</p>
+                <p className="text-yellow-900 font-bold">/data-collect</p>
+              </div>
+              <p className="mt-2 text-xs">
+                💡 CLI命令会自动控制浏览器、自动打开微信公众号、自动获取数据，你只需要登录过一次！
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">📊 数据分析报告</h2>
+        <div className="flex gap-3">
+          <Button
+            onClick={handleAnalyzeData}
+            disabled={analyzing}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {analyzing ? '分析中...' : '📈 分析现有数据'}
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          💡 <strong>当前数据</strong>：{stats.total}篇文章（最后更新：{new Date(stats.brands?.[0]?.avgReads ? '2025-12-09' : '未知').toLocaleDateString('zh-CN')}）
+        </p>
+        <p className="text-sm text-blue-700 mt-2">
+          • 如需更新数据，请使用CLI命令：<code className="bg-blue-100 px-2 py-0.5 rounded">/data-collect</code>
+        </p>
+        <p className="text-sm text-blue-700">
+          • 点击"分析现有数据"重新分析当前的{stats.total}篇文章
+        </p>
+      </div>
 
       {/* 总体统计 */}
       <div>
@@ -1045,10 +1579,33 @@ function DocsTab() {
           ) : selectedFile ? (
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">{selectedFile.split('/').pop()}</h3>
-              <div className="prose prose-sm max-w-none">
-                <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+              <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-code:text-pink-600 prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                  components={{
+                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-4 mb-2" {...props} />,
+                    code: ({node, inline, ...props}: any) =>
+                      inline ?
+                        <code className="px-1.5 py-0.5 rounded bg-gray-100 text-pink-600 text-sm font-mono" {...props} /> :
+                        <code className="block p-4 rounded-lg bg-gray-50 border border-gray-200 text-sm font-mono overflow-x-auto" {...props} />,
+                    pre: ({node, ...props}) => <pre className="my-4" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc list-inside my-4 space-y-2" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal list-inside my-4 space-y-2" {...props} />,
+                    li: ({node, ...props}) => <li className="text-gray-700" {...props} />,
+                    p: ({node, ...props}) => <p className="my-3 leading-relaxed" {...props} />,
+                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-blue-500 pl-4 my-4 italic text-gray-600" {...props} />,
+                    table: ({node, ...props}) => <table className="w-full border-collapse my-4" {...props} />,
+                    thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
+                    th: ({node, ...props}) => <th className="border border-gray-300 px-4 py-2 text-left font-semibold" {...props} />,
+                    td: ({node, ...props}) => <td className="border border-gray-300 px-4 py-2" {...props} />,
+                    a: ({node, ...props}) => <a className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                  }}
+                >
                   {fileContent}
-                </pre>
+                </ReactMarkdown>
               </div>
             </div>
           ) : (
