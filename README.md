@@ -30,7 +30,7 @@
   <img src="images/二维码基础款.png" alt="联系方式" width="600"/>
   <p><strong>获取更多AI资讯和技术支持</strong></p>
   <p>
-    𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> | 微信公众号：<strong>老金带你玩AI</strong> | 个人微信号：备注'AI'加群交流
+    🌐 <a href="https://www.aiking.dev/">aiking.dev</a> | 𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> | 微信公众号：<strong>老金带你玩AI</strong> | 个人微信号：备注'AI'加群交流
   </p>
 </div>
 
