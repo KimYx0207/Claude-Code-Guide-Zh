@@ -29,7 +29,9 @@
 <div align="center">
   <img src="images/二维码基础款.png" alt="联系方式" width="600"/>
   <p><strong>获取更多AI资讯和技术支持</strong></p>
-  <p>微信公众号：获取AI第一信息 | 个人微信号：备注'AI'加群交流</p>
+  <p>
+    𝕏 <a href="https://x.com/KimYx0207">@KimYx0207</a> | 微信公众号：<strong>老金带你玩AI</strong> | 个人微信号：备注'AI'加群交流
+  </p>
 </div>
 
 ### ☕ 请我喝杯咖啡
@@ -271,6 +273,12 @@ Week 8  ：OpenClaw 多Agent + Docker部署 + 安全
 - OC-09 Docker 部署：容器化部署、VPS 部署、Fly.io / Render
 - OC-10 安全最佳实践：Gateway Token、TLS 1.3、沙箱隔离
 - OC-11 常见问题：安装/连接/模型/记忆/性能/中国用户专区
+
+**Claude Code 教程补充**
+- 08-Agent-SDK 新增 3.5 节：Task 工具与子代理编排（子代理类型、DAG 依赖、上下文注入）
+- 02-基础使用 /permissions 节新增权限模式切换（plan/acceptEdits/bypassPermissions）和 allowedTools 配置
+- 04-MCP集成新增 MCP Apps 交互式界面、工具懒加载 ToolSearch（上下文减少 95%）、远程 MCP 服务器
+- README 联系方式新增 X(Twitter) 和微信公众号信息
 
 ### v2.0 (2026-02-25) — 适配 Claude Code 2.1.45
 
