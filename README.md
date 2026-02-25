@@ -14,7 +14,7 @@
 
 > 🎯 **Claude Code（官方编程神器）+ OpenClaw（224K Stars 开源AI助手）= 最强AI工具双教程**
 
-> 📚 21个完整教程 | 130,000+字 | 70+代码示例 | 170+FAQ
+> 📚 22个完整教程 | 130,000+字 | 70+代码示例 | 170+FAQ
 
 > ⭐ 小白友好 | 从零到企业实战 | 双线学习路径
 
@@ -109,17 +109,18 @@
 
 | 序号 | 教程名称 | 难度 | 说明 |
 |------|---------|------|------|
-| OC-01 | [项目介绍](docs/openclaw/01-introduction.md) | ⭐ | OpenClaw 是什么、发展历史、核心架构 |
-| OC-02 | [环境安装](docs/openclaw/02-installation.md) | ⭐ | macOS / Linux / Windows 全平台安装 |
-| OC-03 | [快速开始](docs/openclaw/03-quickstart.md) | ⭐ | 5 分钟跑起来第一个对话 |
-| OC-04 | [AI 模型配置](docs/openclaw/04-model-setup.md) | ⭐⭐ | 接入 OpenAI / Claude / Ollama 等 29 个模型 |
-| OC-05 | [消息平台集成](docs/openclaw/05-channels.md) | ⭐⭐ | 连接 WhatsApp / Telegram / Discord / 飞书等 30+ 平台 |
-| OC-06 | [技能系统](docs/openclaw/06-skills.md) | ⭐⭐ | 50+ 内置技能详解与自定义技能开发 |
-| OC-07 | [记忆系统](docs/openclaw/07-memory.md) | ⭐⭐ | AI 如何记住你的偏好和上下文 |
-| OC-08 | [多 Agent 路由](docs/openclaw/08-multi-agent.md) | ⭐⭐⭐ | 一个网关跑多个独立 AI 助手 |
-| OC-09 | [Docker 部署](docs/openclaw/09-docker.md) | ⭐⭐⭐ | 容器化部署与 VPS 远程访问 |
-| OC-10 | [安全最佳实践](docs/openclaw/10-security.md) | ⭐⭐⭐ | 安全配置、CVE 防护、权限管理 |
-| OC-11 | [常见问题](docs/openclaw/11-faq.md) | ⭐ | 踩坑指南与解决方案 |
+| OC-00 | [阅读指南](docs/openclaw/00-阅读指南.md) | 🟢 | 术语表、文档地图、4条阅读路线 |
+| OC-01 | [项目介绍](docs/openclaw/01-OpenClaw项目介绍.md) | 🟢 | OpenClaw 是什么、发展历史、核心架构 |
+| OC-02 | [安装部署](docs/openclaw/02-安装部署指南.md) | 🟢 | macOS / Linux / Windows 全平台安装 |
+| OC-03 | [快速开始](docs/openclaw/03-快速开始指南.md) | 🟢 | 5 分钟跑起来第一个对话 |
+| OC-04 | [AI 模型配置](docs/openclaw/04-模型配置指南.md) | 🟡 | 接入 OpenAI / Claude / Ollama 等 29 个模型 |
+| OC-05 | [消息平台接入](docs/openclaw/05-消息平台接入指南.md) | 🟡 | 连接 WhatsApp / Telegram / Discord / 飞书等 15+ 平台 |
+| OC-06 | [技能系统](docs/openclaw/06-技能系统指南.md) | 🟡 | 50+ 内置技能详解与自定义技能开发 |
+| OC-07 | [记忆系统](docs/openclaw/07-记忆系统指南.md) | 🟡 | AI 如何记住你的偏好和上下文 |
+| OC-08 | [多 Agent 协作](docs/openclaw/08-多Agent协作指南.md) | 🔴 | 一个网关跑多个独立 AI 助手 |
+| OC-09 | [Docker 部署](docs/openclaw/09-Docker部署指南.md) | 🔴 | 容器化部署与 VPS 远程访问 |
+| OC-10 | [安全配置](docs/openclaw/10-安全配置指南.md) | 🔴 | 安全配置、CVE 防护、权限管理 |
+| OC-11 | [常见问题](docs/openclaw/11-常见问题FAQ.md) | 🟢 | 踩坑指南与解决方案 |
 
 ---
 
@@ -135,7 +136,7 @@
 
 ### OpenClaw
 
-- **Node.js**：22.0.0 或更高版本
+- **Node.js**：22.12.0 或更高版本
 - **AI 模型 API Key**：OpenAI / Anthropic / Google 等（或使用 Ollama 本地模型免 Key）
 - **操作系统**：macOS / Linux / Windows（推荐 WSL2）
 
@@ -186,12 +187,12 @@ Week 8  ：OpenClaw 多Agent + Docker部署 + 安全
 
 | 指标 | 数值 |
 |------|------|
-| **教程总数** | 21 篇完整教程（Claude Code 10 / OpenClaw 11）+ 1 速查卡 |
+| **教程总数** | 22 篇完整教程（Claude Code 10 / OpenClaw 12）+ 1 速查卡 |
 | **总字数** | ~130,000 字 |
 | **代码示例** | 70+个（全部可运行） |
 | **FAQ数量** | 170+ 个 |
 | **覆盖AI模型** | 29 个提供商（OpenClaw） |
-| **覆盖消息平台** | 30+ 个（OpenClaw） |
+| **覆盖消息平台** | 15+ 个（OpenClaw） |
 | **Claude Code版本** | 2.1.52（2026-02-25 验证） |
 | **OpenClaw版本** | v2026.2.23（2026-02-24 验证） |
 
@@ -258,11 +259,14 @@ Week 8  ：OpenClaw 多Agent + Docker部署 + 安全
 **重大更新**
 - 项目升级为 **Claude Code & OpenClaw 双教程**
 - 仓库更名为 `Claude-Code-x-OpenClaw-Guide-Zh`
-- 新增 OpenClaw 11 篇完整中文教程（基于 v2026.2.23）
+- 新增 OpenClaw 11 篇完整中文教程（基于 v2026.2.23）+ 1 篇阅读指南
 - 目录结构重组：`docs/claude-code/` + `docs/openclaw/`
+- OpenClaw 全部文档经源码验证修正技术错误（配置格式、端口、CLI命令、平台支持等）
+- OpenClaw 全部文档加入小白友好元素（难度标记、术语解释、阅读路线、可跳过标记）
 
 **OpenClaw 教程内容**
-- OC-01 项目介绍：发展历史、核心架构、30+消息平台、29个AI模型提供商
+- OC-00 阅读指南：术语表、文档地图、4条阅读路线（小白速通/日常使用/深度定制/生产部署）
+- OC-01 项目介绍：发展历史、核心架构、15+消息平台、29个AI模型提供商
 - OC-02 环境安装：macOS / Linux / Windows / Docker 全平台安装
 - OC-03 快速开始：5 分钟跑起第一个对话
 - OC-04 AI 模型配置：OpenAI / Claude / Gemini / Ollama 等模型接入
