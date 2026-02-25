@@ -537,21 +537,21 @@ claude mcp add --scope user my-server npx -y xxx
 **Windows（PowerShell 7）：**
 ```powershell
 # 永久设置环境变量
-[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', 'ghp_你的Token', 'User')
+[System.Environment]::SetEnvironmentVariable('GITHUB_PERSONAL_ACCESS_TOKEN', 'ghp_你的Token', 'User')
 
 # 验证
-$env:GITHUB_TOKEN
+$env:GITHUB_PERSONAL_ACCESS_TOKEN
 # 应显示你的Token
 ```
 
 **macOS/Linux：**
 ```bash
 # 添加到shell配置文件
-echo 'export GITHUB_TOKEN="ghp_你的Token"' >> ~/.zshrc
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_你的Token"' >> ~/.zshrc
 source ~/.zshrc
 
 # 验证
-echo $GITHUB_TOKEN
+echo $GITHUB_PERSONAL_ACCESS_TOKEN
 ```
 
 **步骤3：添加MCP配置**
@@ -565,14 +565,14 @@ echo $GITHUB_TOKEN
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     }
   }
 }
 ```
 
-> 💡 **说明**：`${GITHUB_TOKEN}` 会自动读取环境变量，不用把Token直接写在配置文件里
+> 💡 **说明**：`${GITHUB_PERSONAL_ACCESS_TOKEN}` 会自动读取环境变量，不用把Token直接写在配置文件里
 
 **步骤4：验证配置**
 
@@ -612,15 +612,15 @@ claude
 {
   "mcpServers": {
     "sqlite": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./data/app.db"],
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "./data/app.db"],
       "env": {}
     }
   }
 }
 ```
 
-> 💡 **说明**：最后一个参数是数据库文件路径，不存在会自动创建
+> 💡 **说明**：最后的参数是数据库文件路径，不存在会自动创建。SQLite MCP是Python包，需要用 `uvx` 而非 `npx`
 
 **提供的工具**：
 
@@ -652,10 +652,7 @@ claude
   "mcpServers": {
     "postgres": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/database"
-      }
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://user:password@localhost:5432/database"]
     }
   }
 }
@@ -664,16 +661,15 @@ claude
 > ⚠️ **安全建议**：
 > - 使用只读数据库用户
 > - 不要在配置文件中硬编码密码
-> - 使用环境变量：`"${POSTGRES_CONNECTION_STRING}"`
+> - 连接字符串通过 `args` 传递，可使用环境变量替代硬编码：`"postgresql://${PGUSER}:${PGPASSWORD}@localhost:5432/database"`
 
 **提供的工具**：
 
 | 工具名 | 功能 | 参数 |
 |--------|------|------|
 | `query` | 执行SQL查询 | sql |
-| `list_schemas` | 列出模式 | - |
-| `list_tables` | 列出表 | schema |
-| `describe_table` | 获取表结构 | schema, table |
+
+> 💡 **说明**：`query` 是唯一的Tool。表结构信息（schemas、tables、columns）通过MCP的Resources机制自动暴露，无需手动调用工具即可获取
 
 ### 3.4 三作用域配置体系
 
@@ -707,9 +703,9 @@ Local > Project > User
 假设三个作用域都配置了 `github` 服务器：
 
 ```
-User作用域：GITHUB_TOKEN = "user-token"
-Project作用域：GITHUB_TOKEN = "${GITHUB_TOKEN}"
-Local作用域：GITHUB_TOKEN = "local-override-token"
+User作用域：GITHUB_PERSONAL_ACCESS_TOKEN = "user-token"
+Project作用域：GITHUB_PERSONAL_ACCESS_TOKEN = "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+Local作用域：GITHUB_PERSONAL_ACCESS_TOKEN = "local-override-token"
 
 最终生效：Local作用域的配置（local-override-token）
 ```
@@ -736,7 +732,7 @@ Local作用域：GITHUB_TOKEN = "local-override-token"
         "command": "npx",
         "args": ["-y", "@modelcontextprotocol/server-github"],
         "env": {
-          "GITHUB_TOKEN": "ghp_xxxx_local_override"
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxxx_local_override"
         }
       }
     }
@@ -753,7 +749,7 @@ Local作用域：GITHUB_TOKEN = "local-override-token"
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     }
   }
@@ -888,8 +884,8 @@ claude mcp add --transport http my-remote-server https://your-server.com/mcp
 {
   "mcpServers": {
     "fetch": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
       "env": {}
     }
   }
@@ -948,12 +944,12 @@ claude mcp add --transport http my-remote-server https://your-server.com/mcp
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "sqlite": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./data/app.db"],
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "./data/app.db"],
       "env": {}
     },
     "context7": {
@@ -974,8 +970,8 @@ claude mcp add --transport http my-remote-server https://your-server.com/mcp
       "env": {}
     },
     "fetch": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
       "env": {}
     }
   }
@@ -1858,7 +1854,7 @@ cat .mcp.json | jq .
 
 **错误信息示例**：
 ```
-Error: GITHUB_TOKEN is required
+Error: GITHUB_PERSONAL_ACCESS_TOKEN is required
 Error: Missing required environment variable
 ```
 
@@ -1867,23 +1863,23 @@ Error: Missing required environment variable
 **Windows（PowerShell）：**
 ```powershell
 # 检查环境变量
-$env:GITHUB_TOKEN
+$env:GITHUB_PERSONAL_ACCESS_TOKEN
 # 如果为空，说明未设置
 
 # 设置环境变量
-[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', 'your-token', 'User')
+[System.Environment]::SetEnvironmentVariable('GITHUB_PERSONAL_ACCESS_TOKEN', 'your-token', 'User')
 
 # 重启终端后验证
-$env:GITHUB_TOKEN
+$env:GITHUB_PERSONAL_ACCESS_TOKEN
 ```
 
 **macOS/Linux：**
 ```bash
 # 检查环境变量
-echo $GITHUB_TOKEN
+echo $GITHUB_PERSONAL_ACCESS_TOKEN
 
 # 如果为空，添加到shell配置
-echo 'export GITHUB_TOKEN="your-token"' >> ~/.zshrc
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="your-token"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -2016,12 +2012,12 @@ del %USERPROFILE%\.claude.json
 {
   "mcpServers": {
     "sqlite-app": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./app.db"]
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "./app.db"]
     },
     "sqlite-analytics": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./analytics.db"]
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "./analytics.db"]
     }
   }
 }
@@ -2193,12 +2189,12 @@ npm publish --access public
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "sqlite": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./data/app.db"],
+      "command": "uvx",
+      "args": ["mcp-server-sqlite", "--db-path", "./data/app.db"],
       "env": {}
     },
     "context7": {
@@ -2219,8 +2215,8 @@ npm publish --access public
       "env": {}
     },
     "fetch": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
       "env": {}
     },
     "sequential-thinking": {
@@ -2256,12 +2252,12 @@ npm publish --access public
 | Filesystem | `@modelcontextprotocol/server-filesystem` | 文件系统操作 | ⭐ |
 | GitHub | `@modelcontextprotocol/server-github` | GitHub仓库管理 | ⭐ |
 | GitLab | `@modelcontextprotocol/server-gitlab` | GitLab仓库管理 |  |
-| Git | `@modelcontextprotocol/server-git` | 本地Git操作 |  |
-| SQLite | `@modelcontextprotocol/server-sqlite` | SQLite数据库 | ⭐ |
+| Git | `mcp-server-git`（Python/uvx） | 本地Git操作 |  |
+| SQLite | `mcp-server-sqlite`（Python/uvx） | SQLite数据库 | ⭐ |
 | PostgreSQL | `@modelcontextprotocol/server-postgres` | PostgreSQL数据库 |  |
 | Memory | `@modelcontextprotocol/server-memory` | 持久化记忆 |  |
-| Fetch | `@modelcontextprotocol/server-fetch` | 网页获取 |  |
-| Time | `@modelcontextprotocol/server-time` | 时间服务 |  |
+| Fetch | `mcp-server-fetch`（Python/uvx） | 网页获取 |  |
+| Time | `mcp-server-time`（Python/uvx） | 时间服务 |  |
 | Sequential Thinking | `@modelcontextprotocol/server-sequential-thinking` | 顺序思考 |  |
 | Puppeteer | `@modelcontextprotocol/server-puppeteer` | 浏览器自动化 |  |
 | Brave Search | `@modelcontextprotocol/server-brave-search` | 网页搜索 | ⭐ |

@@ -468,7 +468,7 @@ async def query(
 // TypeScript
 function query(params: {
   prompt: string | AsyncIterable<SDKUserMessage>;
-  options?: QueryOptions;
+  options?: Options;
 }): Query;
 ```
 
@@ -1350,16 +1350,19 @@ full_options = ClaudeAgentOptions(
 
 ```python
 from claude_agent_sdk import query, ClaudeAgentOptions
+from claude_agent_sdk.types import ToolPermissionContext, PermissionResultAllow, PermissionResultDeny
 
 # 自定义沙箱控制
-async def can_use_tool(tool: str, input: dict) -> bool:
+async def can_use_tool(
+    tool_name: str, tool_input: dict, context: ToolPermissionContext
+) -> PermissionResultAllow | PermissionResultDeny:
     """自定义工具权限检查"""
     # 检查是否请求禁用沙箱
-    if tool == "Bash" and input.get("dangerouslyDisableSandbox"):
-        print(f"警告：请求在沙箱外执行命令：{input.get('command')}")
-        # 返回False拒绝，True允许
-        return False
-    return True
+    if tool_name == "Bash" and tool_input.get("dangerouslyDisableSandbox"):
+        print(f"警告：请求在沙箱外执行命令：{tool_input.get('command')}")
+        # 返回Deny拒绝，Allow允许
+        return PermissionResultDeny(reason="禁止在沙箱外执行命令")
+    return PermissionResultAllow()
 
 options = ClaudeAgentOptions(
     sandbox={
@@ -1543,7 +1546,7 @@ async for message in query(prompt="...", options=options):
 |------|---------|------|
 | 日常开发 | claude-sonnet-4-5-20250929 | 能力强、速度快、价格适中 |
 | 复杂推理 | claude-opus-4-5-20251101 | 最强能力，但价格高 |
-| 简单任务 | claude-haiku-3-5-20241022 | 最便宜，适合简单查询 |
+| 简单任务 | claude-3-5-haiku-20241022 | 最便宜，适合简单查询 |
 
 ```python
 # 性价比之选
@@ -1563,7 +1566,7 @@ options = ClaudeAgentOptions(model='claude-sonnet-4-5-20250929')
 
 ```python
 options = ClaudeAgentOptions(
-    model='claude-haiku-3-5-20241022',  # 便宜模型
+    model='claude-3-5-haiku-20241022',  # 便宜模型
     max_turns=5,  # 限制轮数
     system_prompt="简洁回复。"  # 简短提示
 )
@@ -1773,7 +1776,7 @@ with open("session.json", "w") as f:
 
 - claude-opus-4-5-20251101（最强）
 - claude-sonnet-4-5-20250929（推荐）
-- claude-haiku-3-5-20241022（最快最便宜）
+- claude-3-5-haiku-20241022（最快最便宜）
 
 通过`model`参数指定：
 
@@ -1890,7 +1893,7 @@ async def rate_limited_query(prompts, delay=1.0):
 
 | 版本 | 日期 | 修改内容 |
 |------|------|----------|
-| V1.1 | 2025-12-24 | 修正所有模型名称为最新4.5版本（claude-sonnet-4-5-20250929、claude-opus-4-5-20251101、claude-haiku-3-5-20241022） |
+| V1.1 | 2025-12-24 | 修正所有模型名称为最新4.5版本（claude-sonnet-4-5-20250929、claude-opus-4-5-20251101、claude-3-5-haiku-20241022） |
 | V1.0 | 2025-12-19 | 初版发布 |
 
 **参考资料**：
